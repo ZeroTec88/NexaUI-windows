@@ -13,7 +13,8 @@ Public NotInheritable Class GalleryShell
     Private Shared ReadOnly Pages As (Key As String, Title As String, Factory As Func(Of UserControl))() = {
         ("getting-started", "Getting Started", Function() New GettingStartedScreen()),
         ("themes", "Themes", Function() New GalleryThemesScreen()),
-        ("basic", "Basic Controls", Function() New GalleryBasicControlsScreen())
+        ("basic", "Basic Controls", Function() New GalleryBasicControlsScreen()),
+        ("input", "Input Controls", Function() New GalleryInputControlsScreen())
     }
 
     Private Shared ReadOnly NavItems As (Key As String, Title As String)() = {

@@ -38,6 +38,15 @@ Public NotInheritable Class GalleryBasicControlsScreen
         _root.Controls.Add(SectionTitle("Disabled"))
         _root.Controls.Add(BuildDisabledGrid())
 
+        _root.Controls.Add(SectionTitle("NexaLabel — styles"))
+        _root.Controls.Add(BuildLabelStylesCard())
+        _root.Controls.Add(SectionTitle("NexaLabel — alignment & disabled"))
+        _root.Controls.Add(BuildLabelAlignmentCard())
+        _root.Controls.Add(SectionTitle("NexaLinkLabel"))
+        _root.Controls.Add(BuildLinkLabelCard())
+        _root.Controls.Add(SectionTitle("NexaSeparator"))
+        _root.Controls.Add(BuildSeparatorCard())
+
         _status = New Label With {
             .Dock = DockStyle.Top,
             .AutoSize = True,
@@ -86,7 +95,7 @@ Public NotInheritable Class GalleryBasicControlsScreen
             l.ForeColor = CType(palette(NexaColorRole.TextSecondary).Value, Color)
         End If
 
-        Dim sectionTitles = New String() {"Styles", "Sizes", "Icons & loading", "Disabled"}
+        Dim sectionTitles = New String() {"Styles", "Sizes", "Icons & loading", "Disabled", "NexaLabel — styles", "NexaLabel — alignment & disabled", "NexaLinkLabel", "NexaSeparator"}
         For Each c As Control In _root.Controls
             If TypeOf c Is Label Then
                 Dim l = DirectCast(c, Label)
@@ -240,5 +249,180 @@ Public NotInheritable Class GalleryBasicControlsScreen
     Private Sub NotifyClick(caption As String)
         _status.Text = $"Clicked: {caption} at {DateTime.Now:HH:mm:ss}"
     End Sub
+
+    Private Function BuildLabelStylesCard() As Control
+        Dim card = CreateDemoCard()
+        card.Controls.Add(DescriptionLabel("Modern themed text display control."))
+        card.Controls.Add(Spacer())
+
+        Dim styles = New NexaLabelStyle() {
+            NexaLabelStyle.Default, NexaLabelStyle.Heading, NexaLabelStyle.Subheading,
+            NexaLabelStyle.Caption, NexaLabelStyle.Muted, NexaLabelStyle.Success,
+            NexaLabelStyle.Warning, NexaLabelStyle.Danger, NexaLabelStyle.Info
+        }
+        Dim samples = New String() {
+            "Default Label", "Heading Label", "Subheading Label", "Caption Label",
+            "Muted label text", "Success label", "Warning label", "Danger label", "Info label"
+        }
+
+        For i = 0 To styles.Length - 1
+            Dim row = New FlowLayoutPanel With {
+                .Dock = DockStyle.Top,
+                .AutoSize = True,
+                .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                .WrapContents = False
+            }
+            Dim tag = New Label With {
+                .Text = styles(i).ToString().PadRight(12),
+                .Dock = DockStyle.Left,
+                .Width = 140,
+                .TextAlign = ContentAlignment.MiddleLeft,
+                .Font = New Font("Consolas", 9.0F, FontStyle.Regular, GraphicsUnit.Point),
+                .ForeColor = CType(ThemeManager.Current.Palette(NexaColorRole.TextSecondary).Value, Color)
+            }
+            Dim lbl = New NexaLabel With {
+                .Text = samples(i),
+                .LabelStyle = styles(i),
+                .AutoSize = True,
+                .Dock = DockStyle.Left
+            }
+            row.Controls.Add(tag)
+            row.Controls.Add(lbl)
+            card.Controls.Add(row)
+        Next
+        Return card
+    End Function
+
+    Private Function BuildLabelAlignmentCard() As Control
+        Dim card = CreateDemoCard()
+        card.Controls.Add(DescriptionLabel("Alignment and disabled rendering."))
+        card.Controls.Add(Spacer())
+
+        Dim left = New NexaLabel With {.Text = "Left aligned", .LabelStyle = NexaLabelStyle.Default, .TextAlign = ContentAlignment.MiddleLeft, .AutoSize = False, .Width = 360, .Height = 28, .Dock = DockStyle.Top}
+        Dim center = New NexaLabel With {.Text = "Center aligned", .LabelStyle = NexaLabelStyle.Heading, .TextAlign = ContentAlignment.MiddleCenter, .AutoSize = False, .Width = 360, .Height = 36, .Dock = DockStyle.Top}
+        Dim right = New NexaLabel With {.Text = "Right aligned", .LabelStyle = NexaLabelStyle.Subheading, .TextAlign = ContentAlignment.MiddleRight, .AutoSize = False, .Width = 360, .Height = 32, .Dock = DockStyle.Top}
+        Dim disabled = New NexaLabel With {.Text = "Disabled label (muted, no interaction)", .LabelStyle = NexaLabelStyle.Default, .Enabled = False, .AutoSize = True, .Dock = DockStyle.Top}
+
+        card.Controls.Add(left)
+        card.Controls.Add(center)
+        card.Controls.Add(right)
+        card.Controls.Add(Spacer())
+        card.Controls.Add(disabled)
+        Return card
+    End Function
+
+    Private Function BuildLinkLabelCard() As Control
+        Dim card = CreateDemoCard()
+        card.Controls.Add(DescriptionLabel("Theme-aware hyperlinks. The demo does not launch external sites; LinkClicked is delegated to the consumer."))
+        card.Controls.Add(Spacer())
+
+        Dim docs = New NexaLinkLabel With {.Text = "Open Documentation", .AutoSize = True, .Dock = DockStyle.Top}
+        AddHandler docs.LinkClicked, Sub() _status.Text = "Docs link clicked."
+
+        Dim web = New NexaLinkLabel With {.Text = "Visit Website (demo)", .AutoSize = True, .Dock = DockStyle.Top}
+        AddHandler web.LinkClicked, Sub() _status.Text = "Website link clicked."
+
+        Dim another = New NexaLinkLabel With {.Text = "Another Link", .AutoSize = True, .Dock = DockStyle.Top}
+        AddHandler another.LinkClicked, Sub() _status.Text = "Another link clicked."
+
+        Dim visited = New NexaLinkLabel With {.Text = "Visited Link", .AutoSize = True, .Dock = DockStyle.Top, .Visited = True}
+        AddHandler visited.LinkClicked, Sub()
+                                            visited.Visited = True
+                                            _status.Text = "Visited link clicked."
+                                        End Sub
+
+        Dim disabled = New NexaLinkLabel With {.Text = "Disabled Link", .AutoSize = True, .Dock = DockStyle.Top, .Enabled = False}
+
+        card.Controls.Add(docs)
+        card.Controls.Add(web)
+        card.Controls.Add(another)
+        card.Controls.Add(visited)
+        card.Controls.Add(disabled)
+        Return card
+    End Function
+
+    Private Function BuildSeparatorCard() As Control
+        Dim card = CreateDemoCard()
+        card.Controls.Add(DescriptionLabel("Horizontal and vertical themed dividers. Switch the global theme to verify they update."))
+        card.Controls.Add(Spacer())
+
+        Dim row = New TableLayoutPanel With {
+            .Dock = DockStyle.Top,
+            .AutoSize = True,
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            .ColumnCount = 2
+        }
+        row.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 70.0F))
+        row.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 30.0F))
+
+        Dim leftCol = New FlowLayoutPanel With {
+            .Dock = DockStyle.Fill,
+            .FlowDirection = FlowDirection.TopDown,
+            .WrapContents = False,
+            .AutoSize = True,
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+        }
+        leftCol.Controls.Add(New NexaLabel With {.Text = "Above the separator", .LabelStyle = NexaLabelStyle.Default, .AutoSize = True})
+        leftCol.Controls.Add(New NexaSeparator With {.Dock = DockStyle.Top, .Width = 360, .Margin = New Padding(0, 6, 0, 6)})
+        leftCol.Controls.Add(New NexaLabel With {.Text = "Below the separator", .LabelStyle = NexaLabelStyle.Default, .AutoSize = True})
+        leftCol.Controls.Add(New NexaSeparator With {.Dock = DockStyle.Top, .Width = 360, .Margin = New Padding(0, 12, 0, 6), .Style = NexaSeparatorStyle.Dashed})
+        leftCol.Controls.Add(New NexaLabel With {.Text = "After a 2-DIP thick divider", .LabelStyle = NexaLabelStyle.Caption, .AutoSize = True, .Margin = New Padding(0, 4, 0, 0)})
+        leftCol.Controls.Add(New NexaSeparator With {.Dock = DockStyle.Top, .Width = 360, .ThicknessInDips = 2, .Margin = New Padding(0, 6, 0, 6)})
+        leftCol.Controls.Add(New NexaLabel With {.Text = "After a 3-DIP thick divider", .LabelStyle = NexaLabelStyle.Caption, .AutoSize = True, .Margin = New Padding(0, 4, 0, 0)})
+        leftCol.Controls.Add(New NexaSeparator With {.Dock = DockStyle.Top, .Width = 360, .ThicknessInDips = 3, .Margin = New Padding(0, 6, 0, 0)})
+
+        Dim rightCol = New FlowLayoutPanel With {
+            .Dock = DockStyle.Fill,
+            .FlowDirection = FlowDirection.LeftToRight,
+            .WrapContents = False,
+            .AutoSize = True,
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+        }
+        rightCol.Controls.Add(New NexaLabel With {.Text = "Left", .LabelStyle = NexaLabelStyle.Default, .AutoSize = True})
+        rightCol.Controls.Add(New NexaSeparator With {.Orientation = NexaSeparatorOrientation.Vertical, .Height = 120, .Margin = New Padding(8, 0, 8, 0)})
+        rightCol.Controls.Add(New NexaLabel With {.Text = "Right", .LabelStyle = NexaLabelStyle.Default, .AutoSize = True})
+        rightCol.Controls.Add(New NexaSeparator With {.Orientation = NexaSeparatorOrientation.Vertical, .Height = 120, .ThicknessInDips = 2, .Margin = New Padding(8, 0, 8, 0)})
+        rightCol.Controls.Add(New NexaLabel With {.Text = "Far", .LabelStyle = NexaLabelStyle.Default, .AutoSize = True})
+
+        row.Controls.Add(leftCol, 0, 0)
+        row.Controls.Add(rightCol, 1, 0)
+        card.Controls.Add(row)
+        Return card
+    End Function
+
+    Private Function CreateDemoCard() As Panel
+        Dim palette = ThemeManager.Current.Palette
+        Dim card = New Panel With {
+            .Dock = DockStyle.Top,
+            .AutoSize = True,
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            .Padding = New Padding(16),
+            .Margin = New Padding(0, 0, 0, 12),
+            .BackColor = CType(palette(NexaColorRole.Surface).Value, Color)
+        }
+        AddHandler card.Paint, Sub(s, e)
+                                   Using pen = New Pen(CType(palette(NexaColorRole.Border).Value, Color), 1.0F)
+                                       Dim r = card.ClientRectangle
+                                       r.Width -= 1
+                                       r.Height -= 1
+                                       e.Graphics.DrawRectangle(pen, r)
+                                   End Using
+                               End Sub
+        Return card
+    End Function
+
+    Private Shared Function DescriptionLabel(text As String) As Label
+        Return New Label With {
+            .Text = text,
+            .Dock = DockStyle.Top,
+            .AutoSize = True,
+            .Margin = New Padding(0, 0, 0, 8),
+            .ForeColor = CType(ThemeManager.Current.Palette(NexaColorRole.TextSecondary).Value, Color)
+        }
+    End Function
+
+    Private Shared Function Spacer() As Panel
+        Return New Panel With {.Dock = DockStyle.Top, .Height = 8}
+    End Function
 
 End Class

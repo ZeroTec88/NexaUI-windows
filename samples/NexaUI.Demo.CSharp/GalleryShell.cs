@@ -16,6 +16,7 @@ public sealed class GalleryShell : Form
         ("getting-started", "Getting Started", () => new GettingStartedScreen()),
         ("themes", "Themes", () => new GalleryThemesScreen()),
         ("basic", "Basic Controls", () => new GalleryBasicControlsScreen()),
+        ("input", "Input Controls", () => new GalleryInputControlsScreen()),
     };
 
     private static readonly (string Key, string Title)[] NavItems =
