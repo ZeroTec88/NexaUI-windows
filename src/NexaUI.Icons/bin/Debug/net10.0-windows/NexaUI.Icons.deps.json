@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "NexaUI.Icons/1.0.0": {
+        "dependencies": {
+          "NexaUI.Core": "1.0.0"
+        },
+        "runtime": {
+          "NexaUI.Icons.dll": {}
+        }
+      },
+      "NexaUI.Core/1.0.0": {
+        "runtime": {
+          "NexaUI.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "NexaUI.Icons/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NexaUI.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

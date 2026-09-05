@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>NexaUI.Demo.VB</RootNamespace>
+    <StartupObject>Sub Main</StartupObject>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>NexaUI.Demo.VB</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NexaUI.Core\NexaUI.Core.csproj" />
+    <ProjectReference Include="..\..\src\NexaUI.Themes\NexaUI.Themes.csproj" />
+    <ProjectReference Include="..\..\src\NexaUI.Controls\NexaUI.Controls.csproj" />
+    <ProjectReference Include="..\..\src\NexaUI.Icons\NexaUI.Icons.csproj" />
+  </ItemGroup>
+
+</Project>

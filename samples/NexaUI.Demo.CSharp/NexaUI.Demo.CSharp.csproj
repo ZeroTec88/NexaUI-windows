@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>NexaUI.Demo.CSharp</RootNamespace>
+    <AssemblyName>NexaUI.Demo.CSharp</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NexaUI.Core\NexaUI.Core.csproj" />
+    <ProjectReference Include="..\..\src\NexaUI.Themes\NexaUI.Themes.csproj" />
+    <ProjectReference Include="..\..\src\NexaUI.Controls\NexaUI.Controls.csproj" />
+    <ProjectReference Include="..\..\src\NexaUI.Icons\NexaUI.Icons.csproj" />
+  </ItemGroup>
+
+</Project>

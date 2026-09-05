@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/NexaUI.Demo.CSharp/NexaUI.Demo.CSharp.csproj" />
+    <Project Path="samples/NexaUI.Demo.VB/NexaUI.Demo.VB.vbproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/NexaUI.Controls/NexaUI.Controls.csproj" />
+    <Project Path="src/NexaUI.Core/NexaUI.Core.csproj" />
+    <Project Path="src/NexaUI.Icons/NexaUI.Icons.csproj" />
+    <Project Path="src/NexaUI.Themes/NexaUI.Themes.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/NexaUI.Tests/NexaUI.Tests.csproj" />
+  </Folder>
+</Solution>
