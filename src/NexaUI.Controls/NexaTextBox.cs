@@ -73,6 +73,8 @@ public class NexaTextBox : NexaInputHost
         BorderHost.HandleCreated += (_, _) => ApplyPlaceholder();
         BorderHost.Resize += (_, _) => LayoutInner();
     }
+
+    /// <summary>Provides access to the inner native <see cref="TextBox"/> for advanced scenarios.</summary>
     [Browsable(false)]
     public TextBox InnerTextBox => _edit;
 
@@ -91,7 +93,7 @@ public class NexaTextBox : NexaInputHost
         get => _edit.MaxLength;
         set { _edit.MaxLength = value; base.MaxLength = value; BorderHost.Invalidate(); }
     }
-    public bool Multiline { get => _edit.Multiline; set => _edit.Multiline = value; LayoutInner(); }
+    public bool Multiline { get => _edit.Multiline; set { _edit.Multiline = value; LayoutInner(); } }
     public bool ReadOnly { get => _edit.ReadOnly; set { _edit.ReadOnly = value; LayoutInner(); } }
     public bool UseSystemPasswordChar { get => _edit.UseSystemPasswordChar; set => _edit.UseSystemPasswordChar = value; }
     public char PasswordChar { get => _edit.PasswordChar; set => _edit.PasswordChar = value; }
@@ -177,15 +179,15 @@ public class NexaTextBox : NexaInputHost
     private void LayoutInner()
     {
         if (BorderHost is null || BorderHost.Width == 0) return;
-        var dpi = CurrentDpi();
+        float dpi = CurrentDpi();
         var inner = new Rectangle(0, 0, BorderHost.Width, BorderHost.Height);
         var topPad = VerticalPaddingFor(dpi);
-        var sidePad = NexaDpi.Scale(12, dpi);
+        var sidePad = NexaDpi.Scale(10, dpi);
 
         var leftReserved = 0;
-        if (_iconKind != NexaIconKind.None) leftReserved = NexaDpi.Scale(36, dpi);
+        if (_iconKind != NexaIconKind.None) leftReserved = NexaDpi.Scale(34, dpi);
         var rightReserved = 0;
-        if (_showClearButtonActive) rightReserved = NexaDpi.Scale(32, dpi);
+        if (_showClearButtonActive) rightReserved = NexaDpi.Scale(30, dpi);
 
         var editRect = new Rectangle(
             inner.Left + sidePad + leftReserved,
@@ -199,12 +201,12 @@ public class NexaTextBox : NexaInputHost
             _iconPanel.Visible = true;
             if (_iconKind != NexaIconKind.None)
             {
-                _iconPanel.Bounds = new Rectangle(inner.Left, inner.Top, NexaDpi.Scale(36, dpi), inner.Height);
+                _iconPanel.Bounds = new Rectangle(inner.Left, inner.Top, NexaDpi.Scale(34, dpi), inner.Height);
                 _iconPanel.Cursor = Cursors.Default;
             }
             else
             {
-                _iconPanel.Bounds = new Rectangle(inner.Right - NexaDpi.Scale(32, dpi), inner.Top, NexaDpi.Scale(32, dpi), inner.Height);
+                _iconPanel.Bounds = new Rectangle(inner.Right - NexaDpi.Scale(30, dpi), inner.Top, NexaDpi.Scale(30, dpi), inner.Height);
                 _iconPanel.Cursor = Cursors.Hand;
             }
         }
@@ -223,18 +225,25 @@ public class NexaTextBox : NexaInputHost
 
         var theme = ThemeManager.Current;
         var palette = theme.Palette;
-        var dpi = CurrentDpi();
+        float dpi = CurrentDpi();
+        var rect = _iconPanel.ClientRectangle;
 
         if (_showClearButtonActive)
         {
+            if (_iconHovered)
+            {
+                var bg = Color.FromArgb(40, (Color)palette[NexaColorRole.TextPrimary].Value);
+                using var bgBrush = new SolidBrush(bg);
+                g.FillEllipse(bgBrush, rect);
+            }
             var tint = _iconHovered
                 ? (Color)palette[NexaColorRole.TextPrimary].Value
                 : (Color)palette[NexaColorRole.TextSecondary].Value;
-            var size = NexaDpi.Scale(14, dpi);
+            var size = NexaDpi.Scale(13, dpi);
             var bmp = NexaIconProvider.ToBitmap(NexaIconKind.Cross, new Size(size, size), tint);
             if (bmp is not null)
             {
-                g.DrawImage(bmp, (_iconPanel.Width - bmp.Width) / 2, (_iconPanel.Height - bmp.Height) / 2);
+                g.DrawImage(bmp, (rect.Width - bmp.Width) / 2, (rect.Height - bmp.Height) / 2);
             }
         }
         else if (_iconKind != NexaIconKind.None)
@@ -244,11 +253,11 @@ public class NexaTextBox : NexaInputHost
                     ? (Color)palette[NexaColorRole.Primary].Value
                     : (Color)palette[NexaColorRole.TextSecondary].Value
                 : (Color)palette[NexaColorRole.TextDisabled].Value;
-            var size = NexaDpi.Scale(16, dpi);
+            var size = NexaDpi.Scale(15, dpi);
             var bmp = NexaIconProvider.ToBitmap(_iconKind, new Size(size, size), tint);
             if (bmp is not null)
             {
-                g.DrawImage(bmp, NexaDpi.Scale(10, dpi), (_iconPanel.Height - bmp.Height) / 2);
+                g.DrawImage(bmp, (rect.Width - bmp.Width) / 2, (rect.Height - bmp.Height) / 2);
             }
         }
     }
@@ -283,7 +292,7 @@ public class NexaTextBox : NexaInputHost
         if (IsDisposed || Disposing) return;
         var palette = theme.Palette;
         var typography = theme.Typography;
-        var dpi = CurrentDpi();
+        float dpi = CurrentDpi();
 
         var textColor = (Color)palette[NexaColorRole.TextPrimary].Value;
         var disabled = (Color)palette[NexaColorRole.TextDisabled].Value;
@@ -296,8 +305,6 @@ public class NexaTextBox : NexaInputHost
         _iconPanel.BackColor = _edit.BackColor;
         _iconPanel.Invalidate();
     }
-
-    private void OnThemeChangedHandler(object? sender, ThemeChangedEventArgs e) => ApplyTheme(e.Current);
 
     protected override void OnThemeApplied(ITheme theme)
     {

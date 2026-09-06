@@ -21,7 +21,7 @@ public class NexaButton : Button
     private NexaButtonStyle _style = NexaButtonStyle.Primary;
     private NexaButtonSize _size = NexaButtonSize.Medium;
     private NexaButtonIconPosition _iconPosition = NexaButtonIconPosition.Left;
-    private int _borderRadiusInDips = 6;
+    private int _borderRadiusInDips = 2;
     private bool _loading;
     private string _loadingText = "Loading...";
     private string _originalText = string.Empty;
@@ -85,7 +85,7 @@ public class NexaButton : Button
     }
 
     [Category("NexaUI")]
-    [DefaultValue(6)]
+    [DefaultValue(2)]
     [Description("Corner radius in DIPs. Use 0 for a square button.")]
     public int BorderRadius
     {

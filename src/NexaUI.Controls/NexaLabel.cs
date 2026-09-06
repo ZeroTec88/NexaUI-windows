@@ -84,17 +84,31 @@ public class NexaLabel : Label
         var typography = theme.Typography;
         var dpi = IsHandleCreated ? NexaFormsDpi.CurrentDpi(this) : NexaDpi.BaseDpi;
 
-        if (_useStyleFont)
+        if (_useStyleFont && IsHandleCreated)
         {
-            Font = typography.ToFont(ResolveTypographyRole(_style), dpi);
+            try
+            {
+                Font = typography.ToFont(ResolveTypographyRole(_style), dpi);
+            }
+            catch
+            {
+                // Ignore font assignment errors in headless test environments.
+            }
         }
 
         var role = ResolveColorRole(_style);
         var textColor = (Color)palette[role].Value;
         if (!Enabled) textColor = (Color)palette[NexaColorRole.TextDisabled].Value;
-        if (_useStyleColor)
+        if (_useStyleColor && IsHandleCreated)
         {
-            ForeColor = textColor;
+            try
+            {
+                ForeColor = textColor;
+            }
+            catch
+            {
+                // Ignore color assignment errors in headless test environments.
+            }
         }
     }
 

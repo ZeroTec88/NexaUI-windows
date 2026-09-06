@@ -30,7 +30,7 @@ public abstract class NexaInputHost : UserControl
     private string _errorText = string.Empty;
     private bool _showCounter;
     private int _maxLength = 32767;
-    private int _cornerRadiusInDips = 8;
+    private int _cornerRadiusInDips = 2;
     private bool _hovered;
     private bool _showHelperText = true;
 
@@ -50,7 +50,6 @@ public abstract class NexaInputHost : UserControl
         BackColor = Color.Transparent;
         DoubleBuffered = true;
         AutoSize = false;
-        Size = new Size(280, 70);
 
         _borderPanel = new Panel
         {
@@ -60,6 +59,8 @@ public abstract class NexaInputHost : UserControl
         };
         _borderPanel.Paint += OnBorderPaint;
         Controls.Add(_borderPanel);
+
+        base.Size = new Size(280, 70);
 
         ThemeManager.ThemeChanged += OnThemeChanged;
         Disposed += (_, _) => ThemeManager.ThemeChanged -= OnThemeChanged;
@@ -95,7 +96,7 @@ public abstract class NexaInputHost : UserControl
     [Category("NexaUI")]
     [DefaultValue(NexaInputSize.Medium)]
     [Description("Vertical size of the input.")]
-    public NexaInputSize Size
+    public NexaInputSize InputSize
     {
         get => _size;
         set { _size = value; UpdateHeight(); _borderPanel.Invalidate(); Invalidate(); }
@@ -147,7 +148,7 @@ public abstract class NexaInputHost : UserControl
     }
 
     [Category("NexaUI")]
-    [DefaultValue(8)]
+    [DefaultValue(2)]
     [Description("Corner radius in DIPs. Ignored by the Underline style.")]
     public int CornerRadius
     {
@@ -157,11 +158,13 @@ public abstract class NexaInputHost : UserControl
 
     /// <summary>The maximum length used for the counter. Subclasses can override to forward their native editor's value.</summary>
     [Browsable(false)]
+#pragma warning disable WFO1000
     public virtual int MaxLength
     {
         get => _maxLength;
         set { _maxLength = Math.Max(0, value); _borderPanel.Invalidate(); }
     }
+#pragma warning restore WFO1000
 
     [Browsable(false)]
     public bool HasError => _validation == NexaTextValidationState.Error;
@@ -174,7 +177,7 @@ public abstract class NexaInputHost : UserControl
     {
         get
         {
-            var dpi = CurrentDpi();
+            float dpi = CurrentDpi();
             var padX = NexaDpi.Scale(12, dpi);
             var leftText = padX;
             var rightText = padX;
@@ -189,7 +192,7 @@ public abstract class NexaInputHost : UserControl
     }
 
     /// <summary>The vertical padding to apply around the inner editor, in pixels.</summary>
-    protected int VerticalPaddingFor(int dpi) => _size switch
+    protected int VerticalPaddingFor(float dpi) => _size switch
     {
         NexaInputSize.Small => NexaDpi.Scale(4, dpi),
         NexaInputSize.Medium => NexaDpi.Scale(8, dpi),
@@ -202,7 +205,7 @@ public abstract class NexaInputHost : UserControl
     {
         get
         {
-            var dpi = CurrentDpi();
+            float dpi = CurrentDpi();
             var baseH = _size switch
             {
                 NexaInputSize.Small => 32,
@@ -219,7 +222,7 @@ public abstract class NexaInputHost : UserControl
     {
         get
         {
-            var dpi = CurrentDpi();
+            float dpi = CurrentDpi();
             var labelH = string.IsNullOrEmpty(_label) ? 0 : NexaDpi.Scale(20, dpi);
             var helpH = _showHelperText && (!string.IsNullOrEmpty(_helperText) || HasError) ? NexaDpi.Scale(20, dpi) : 0;
             var gap1 = labelH > 0 ? NexaDpi.Scale(4, dpi) : 0;
@@ -228,7 +231,7 @@ public abstract class NexaInputHost : UserControl
         }
     }
 
-    protected int CurrentDpi() => IsHandleCreated && !DesignMode ? NexaFormsDpi.CurrentDpi(this) : NexaDpi.BaseDpi;
+    protected float CurrentDpi() => IsHandleCreated && !DesignMode ? NexaFormsDpi.CurrentDpi(this) : NexaDpi.BaseDpi;
 
     private void UpdateHeight()
     {
@@ -241,6 +244,7 @@ public abstract class NexaInputHost : UserControl
     protected override void OnResize(System.EventArgs e)
     {
         base.OnResize(e);
+        if (_borderPanel is null) return;
         UpdateHeight();
         _borderPanel.Invalidate();
     }
@@ -293,7 +297,7 @@ public abstract class NexaInputHost : UserControl
         var theme = ThemeManager.Current;
         var palette = theme.Palette;
         var typography = theme.Typography;
-        var dpi = CurrentDpi();
+        float dpi = CurrentDpi();
 
         var y = 0;
 
@@ -335,7 +339,7 @@ public abstract class NexaInputHost : UserControl
 
         var theme = ThemeManager.Current;
         var palette = theme.Palette;
-        var dpi = CurrentDpi();
+        float dpi = CurrentDpi();
 
         var hasFocus = InnerHasFocus() && Enabled;
         var hovered = _hovered && Enabled;
@@ -420,20 +424,10 @@ public abstract class NexaInputHost : UserControl
 
     private void PaintOutline(Graphics g, Rectangle rect, Color fill, Color borderColor, int borderWidth, NexaPalette palette, bool hasFocus)
     {
-        var dpi = CurrentDpi();
+        float dpi = CurrentDpi();
         var radius = NexaDpi.Scale(_cornerRadiusInDips, dpi);
 
-        var inflated = Rectangle.Inflate(rect, new Padding(-1));
-        if (hasFocus)
-        {
-            using var glowPen = new Pen(Color.FromArgb(40, borderColor), NexaDpi.Scale(6, dpi))
-            {
-                Alignment = PenAlignment.Outset
-            };
-            using var glowPath = CreateRoundedPath(inflated, radius + NexaDpi.Scale(2, dpi));
-            g.DrawPath(glowPen, glowPath);
-        }
-
+        var inflated = Rectangle.Inflate(rect, -1, -1);
         using (var path = CreateRoundedPath(inflated, radius))
         {
             if (fill.A > 0)
@@ -444,24 +438,22 @@ public abstract class NexaInputHost : UserControl
             using var borderPen = new Pen(borderColor, borderWidth);
             g.DrawPath(borderPen, path);
         }
+
+        if (hasFocus)
+        {
+            var focusRect = Rectangle.Inflate(inflated, -NexaDpi.Scale(2, dpi), -NexaDpi.Scale(2, dpi));
+            using var focusPath = CreateRoundedPath(focusRect, Math.Max(0, radius - NexaDpi.Scale(2, dpi)));
+            using var focusPen = new Pen((Color)palette[NexaColorRole.Focus].Value, NexaDpi.Scale(1, dpi));
+            g.DrawPath(focusPen, focusPath);
+        }
     }
 
     private void PaintFilled(Graphics g, Rectangle rect, Color fill, Color borderColor, int borderWidth, NexaPalette palette, bool hasFocus)
     {
-        var dpi = CurrentDpi();
+        float dpi = CurrentDpi();
         var radius = NexaDpi.Scale(_cornerRadiusInDips, dpi);
 
-        var inflated = Rectangle.Inflate(rect, new Padding(-1));
-        if (hasFocus)
-        {
-            using var glowPen = new Pen(Color.FromArgb(40, borderColor), NexaDpi.Scale(6, dpi))
-            {
-                Alignment = PenAlignment.Outset
-            };
-            using var glowPath = CreateRoundedPath(inflated, radius + NexaDpi.Scale(2, dpi));
-            g.DrawPath(glowPen, glowPath);
-        }
-
+        var inflated = Rectangle.Inflate(rect, -1, -1);
         using (var path = CreateRoundedPath(inflated, radius))
         {
             if (fill.A > 0)
@@ -472,21 +464,31 @@ public abstract class NexaInputHost : UserControl
             using var borderPen = new Pen(Color.FromArgb(160, borderColor), 1F);
             g.DrawPath(borderPen, path);
         }
+
+        if (hasFocus)
+        {
+            var focusRect = Rectangle.Inflate(inflated, -NexaDpi.Scale(2, dpi), -NexaDpi.Scale(2, dpi));
+            using var focusPath = CreateRoundedPath(focusRect, Math.Max(0, radius - NexaDpi.Scale(2, dpi)));
+            using var focusPen = new Pen((Color)palette[NexaColorRole.Focus].Value, NexaDpi.Scale(1, dpi));
+            g.DrawPath(focusPen, focusPath);
+        }
     }
 
     private void PaintUnderline(Graphics g, Rectangle rect, Color fill, Color borderColor, int borderWidth, NexaPalette palette, bool hasFocus)
     {
-        if (hasFocus)
-        {
-            var glowRect = new Rectangle(0, rect.Bottom - NexaDpi.Scale(8, CurrentDpi()), rect.Width, NexaDpi.Scale(8, CurrentDpi()));
-            using var glowBrush = new SolidBrush(Color.FromArgb(40, borderColor));
-            g.FillRectangle(glowBrush, glowRect);
-        }
+        float dpi = CurrentDpi();
         using var pen = new Pen(borderColor, borderWidth);
         g.DrawLine(pen, 0, rect.Bottom - pen.Width / 2, rect.Width, rect.Bottom - pen.Width / 2);
+
+        if (hasFocus)
+        {
+            using var focusPen = new Pen((Color)palette[NexaColorRole.Focus].Value, NexaDpi.Scale(1, dpi));
+            var focusY = rect.Bottom + NexaDpi.Scale(1, dpi);
+            g.DrawLine(focusPen, 0, focusY, rect.Width, focusY);
+        }
     }
 
-    private void PaintValidationIcon(Graphics g, Rectangle rect, NexaPalette palette, int dpi)
+    private void PaintValidationIcon(Graphics g, Rectangle rect, NexaPalette palette, float dpi)
     {
         var color = HasError
             ? (Color)palette[NexaColorRole.Danger].Value
@@ -501,7 +503,7 @@ public abstract class NexaInputHost : UserControl
         g.DrawImage(bmp, x, y);
     }
 
-    private void PaintCounter(Graphics g, Rectangle rect, NexaPalette palette, int dpi)
+    private void PaintCounter(Graphics g, Rectangle rect, NexaPalette palette, float dpi)
     {
         var theme = ThemeManager.Current;
         var typography = theme.Typography;
@@ -520,8 +522,8 @@ public abstract class NexaInputHost : UserControl
 
     protected bool HasValidationIcon() => _validation != NexaTextValidationState.None && Enabled;
 
-    protected int ValidationIconReservedWidth(int dpi) => NexaDpi.Scale(36, dpi);
-    protected int CounterReservedWidth(int dpi) => NexaDpi.Scale(60, dpi);
+    protected int ValidationIconReservedWidth(float dpi) => NexaDpi.Scale(36, dpi);
+    protected int CounterReservedWidth(float dpi) => NexaDpi.Scale(60, dpi);
 
     internal static GraphicsPath CreateRoundedPath(Rectangle rect, int radius)
     {

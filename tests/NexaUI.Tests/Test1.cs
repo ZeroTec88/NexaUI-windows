@@ -103,7 +103,7 @@ public sealed class NexaButtonApiTests
             BindingFlags.Public | BindingFlags.Instance);
         var attr = prop!.GetCustomAttribute<System.ComponentModel.DefaultValueAttribute>();
         Assert.IsNotNull(attr);
-        Assert.AreEqual(6, attr!.Value);
+        Assert.AreEqual(2, attr!.Value);
     }
 
     [TestMethod]

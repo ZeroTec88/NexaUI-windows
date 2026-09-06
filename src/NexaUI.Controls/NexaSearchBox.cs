@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using NexaUI.Core;
 using NexaUI.Icons;
@@ -9,9 +10,9 @@ using NexaUI.Themes;
 namespace NexaUI.Controls;
 
 /// <summary>
-/// A themed search field. Hosts a native <see cref="TextBox"/> inside a themed border,
-/// adds a search icon prefix and an optional clear button. Supports an optional debounce
-/// so <see cref="SearchChanged"/> fires only after the user stops typing.
+/// A Bootstrap-style themed search field. Hosts a native <see cref="TextBox"/> inside a themed
+/// border, adds a search icon prefix and an optional clear button, and supports a debounced
+/// <see cref="SearchChanged"/> event.
 /// </summary>
 [DefaultEvent(nameof(SearchChanged))]
 [DefaultProperty(nameof(SearchText))]
@@ -20,9 +21,8 @@ public class NexaSearchBox : NexaInputHost
     private const int DefaultSearchDelayMs = 250;
 
     private readonly TextBox _edit;
-    private readonly Button _clearButton;
-    private readonly Panel _iconPanel;
-    private readonly TableLayoutPanel _layout;
+    private readonly Panel _leftIconPanel;
+    private readonly Panel _clearIconPanel;
     private readonly System.Windows.Forms.Timer _debounceTimer;
 
     private string _searchText = string.Empty;
@@ -31,35 +31,18 @@ public class NexaSearchBox : NexaInputHost
     private bool _escapeClearsText = true;
     private bool _suppressSearchChanged;
     private bool _debounceActive;
+    private bool _clearHovered;
+    private string _placeholderText = string.Empty;
 
     public NexaSearchBox()
     {
         TabStop = true;
 
-        _layout = new TableLayoutPanel
-        {
-            Dock = DockStyle.Fill,
-            ColumnCount = 3,
-            RowCount = 1,
-            Padding = new Padding(0),
-            BackColor = Color.Transparent
-        };
-        _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 28F));
-        _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-        _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 22F));
-
-        _iconPanel = new Panel
-        {
-            Dock = DockStyle.Fill,
-            BackColor = Color.Transparent
-        };
-        _iconPanel.Paint += OnIconPaint;
-
         _edit = new TextBox
         {
-            Dock = DockStyle.Fill,
             BorderStyle = BorderStyle.None,
-            TabStop = false
+            TabStop = false,
+            BackColor = Color.White
         };
         _edit.TextChanged += OnInnerTextChanged;
         _edit.GotFocus += (_, _) => BorderHost.Invalidate();
@@ -72,44 +55,43 @@ public class NexaSearchBox : NexaInputHost
         _edit.GotFocus += (_, _) => GotFocus?.Invoke(this, EventArgs.Empty);
         _edit.LostFocus += (_, _) => LostFocus?.Invoke(this, EventArgs.Empty);
 
-        _clearButton = new Button
+        _leftIconPanel = new Panel
         {
-            Text = "✕",
-            Dock = DockStyle.Fill,
-            Visible = false,
-            FlatStyle = FlatStyle.Flat,
-            TabStop = false,
-            Cursor = Cursors.Hand,
-            Margin = new Padding(0),
-            Font = new Font("Segoe UI Symbol", 9F, FontStyle.Regular, GraphicsUnit.Point)
+            BackColor = Color.Transparent,
+            Cursor = Cursors.Default
         };
-        _clearButton.FlatAppearance.BorderSize = 0;
-        _clearButton.FlatAppearance.MouseDownBackColor = Color.Transparent;
-        _clearButton.FlatAppearance.MouseOverBackColor = Color.Transparent;
-        _clearButton.FlatAppearance.CheckedBackColor = Color.Transparent;
-        _clearButton.Click += (_, _) => Clear();
+        _leftIconPanel.Paint += OnLeftIconPaint;
 
-        _layout.Controls.Add(_iconPanel, 0, 0);
-        _layout.Controls.Add(_edit, 1, 0);
-        _layout.Controls.Add(_clearButton, 2, 0);
-        BorderHost.Controls.Add(_layout);
+        _clearIconPanel = new Panel
+        {
+            BackColor = Color.Transparent,
+            Cursor = Cursors.Hand,
+            Visible = false
+        };
+        _clearIconPanel.Paint += OnClearIconPaint;
+        _clearIconPanel.MouseDown += (_, _) => Clear();
+        _clearIconPanel.MouseMove += (_, _) => { _clearHovered = true; _clearIconPanel.Invalidate(); };
+        _clearIconPanel.MouseLeave += (_, _) => { _clearHovered = false; _clearIconPanel.Invalidate(); };
+
+        BorderHost.Controls.Add(_edit);
+        BorderHost.Controls.Add(_leftIconPanel);
+        BorderHost.Controls.Add(_clearIconPanel);
 
         _debounceTimer = new System.Windows.Forms.Timer { Interval = _searchDelayMs };
         _debounceTimer.Tick += OnDebounceTick;
 
-        ThemeManager.ThemeChanged += (_, e) => ApplyTheme(e.Current);
-        Disposed += OnSelfDisposed;
         HandleCreated += (_, _) =>
         {
-            ApplyTheme(ThemeManager.Current);
             ApplyPlaceholder();
+            LayoutInner();
         };
         BorderHost.HandleCreated += (_, _) => ApplyPlaceholder();
+        BorderHost.Resize += (_, _) => LayoutInner();
+        Disposed += OnSelfDisposed;
     }
 
     private void OnSelfDisposed(object? sender, EventArgs e)
     {
-        ThemeManager.ThemeChanged -= OnSelfDisposed;
         _debounceTimer.Stop();
         _debounceTimer.Tick -= OnDebounceTick;
         _debounceTimer.Dispose();
@@ -129,7 +111,7 @@ public class NexaSearchBox : NexaInputHost
             try { _edit.Text = value ?? string.Empty; }
             finally { _suppressSearchChanged = false; }
             _searchText = _edit.Text;
-            UpdateClearButtonVisibility();
+            LayoutInner();
         }
     }
 
@@ -137,13 +119,8 @@ public class NexaSearchBox : NexaInputHost
     public string PlaceholderText
     {
         get => _placeholderText;
-        set
-        {
-            _placeholderText = value ?? string.Empty;
-            ApplyPlaceholder();
-        }
+        set { _placeholderText = value ?? string.Empty; ApplyPlaceholder(); }
     }
-    private string _placeholderText = string.Empty;
 
     public int SearchDelayMs
     {
@@ -158,7 +135,7 @@ public class NexaSearchBox : NexaInputHost
     public bool ShowClearButton
     {
         get => _showClearButton;
-        set { _showClearButton = value; UpdateClearButtonVisibility(); }
+        set { _showClearButton = value; LayoutInner(); }
     }
 
     public bool EscapeClearsText
@@ -170,7 +147,7 @@ public class NexaSearchBox : NexaInputHost
     public bool ReadOnly
     {
         get => _edit.ReadOnly;
-        set { _edit.ReadOnly = value; UpdateClearButtonVisibility(); }
+        set { _edit.ReadOnly = value; LayoutInner(); }
     }
 #pragma warning restore WFO1000
 
@@ -186,9 +163,13 @@ public class NexaSearchBox : NexaInputHost
 
     public void Clear()
     {
+        _suppressSearchChanged = true;
+        try { _edit.Clear(); }
+        finally { _suppressSearchChanged = false; }
         _searchText = string.Empty;
-        _edit.Clear();
-        UpdateClearButtonVisibility();
+        _debounceTimer.Stop();
+        _debounceActive = false;
+        LayoutInner();
         RaiseSearchChangedNow();
         Cleared?.Invoke(this, EventArgs.Empty);
     }
@@ -196,7 +177,10 @@ public class NexaSearchBox : NexaInputHost
     public void SelectAll() => _edit.SelectAll();
     public void FocusEdit() => _edit.Focus();
 
+    public bool IsDebounceActive => _debounceActive;
+
     protected override bool InnerHasFocus() => _edit.Focused;
+    protected override int InnerTextLength() => _edit.TextLength;
 
     protected override void OnGotFocus(System.EventArgs e)
     {
@@ -208,13 +192,43 @@ public class NexaSearchBox : NexaInputHost
     {
         base.OnEnabledChanged(e);
         _edit.Enabled = Enabled;
-        UpdateClearButtonVisibility();
+        BorderHost.Invalidate();
+    }
+
+    private void LayoutInner()
+    {
+        if (BorderHost is null || BorderHost.Width == 0) return;
+        float dpi = CurrentDpi();
+        var inner = new Rectangle(0, 0, BorderHost.Width, BorderHost.Height);
+        var topPad = VerticalPaddingFor(dpi);
+        var sidePad = NexaDpi.Scale(10, dpi);
+        var leftReserved = NexaDpi.Scale(34, dpi);
+        var rightReserved = (_showClearButton && !_edit.ReadOnly && _edit.TextLength > 0) ? NexaDpi.Scale(30, dpi) : sidePad;
+
+        _edit.Bounds = new Rectangle(
+            inner.Left + sidePad + leftReserved,
+            inner.Top + topPad,
+            Math.Max(0, inner.Width - sidePad - leftReserved - rightReserved),
+            Math.Max(0, inner.Height - 2 * topPad));
+
+        _leftIconPanel.Bounds = new Rectangle(inner.Left, inner.Top, leftReserved, inner.Height);
+
+        if (_showClearButton && !_edit.ReadOnly && _edit.TextLength > 0)
+        {
+            _clearIconPanel.Visible = true;
+            _clearIconPanel.Bounds = new Rectangle(inner.Right - rightReserved, inner.Top, rightReserved, inner.Height);
+            _clearIconPanel.Invalidate();
+        }
+        else
+        {
+            _clearIconPanel.Visible = false;
+        }
     }
 
     private void OnInnerTextChanged(object? sender, EventArgs e)
     {
         _searchText = _edit.Text;
-        UpdateClearButtonVisibility();
+        LayoutInner();
 
         if (_suppressSearchChanged) return;
 
@@ -240,23 +254,14 @@ public class NexaSearchBox : NexaInputHost
 
     private void RaiseSearchChangedNow()
     {
-        var args = new SearchChangedEventArgs(_searchText);
-        SearchChanged?.Invoke(this, args);
+        SearchChanged?.Invoke(this, new SearchChangedEventArgs(_searchText));
     }
 
     private void OnInnerKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Escape && _escapeClearsText && _edit.TextLength > 0)
         {
-            _suppressSearchChanged = true;
-            try { _edit.Text = string.Empty; }
-            finally { _suppressSearchChanged = false; }
-            _searchText = string.Empty;
-            _debounceTimer.Stop();
-            _debounceActive = false;
-            UpdateClearButtonVisibility();
-            RaiseSearchChangedNow();
-            Cleared?.Invoke(this, EventArgs.Empty);
+            Clear();
             e.SuppressKeyPress = true;
             e.Handled = true;
             return;
@@ -264,25 +269,49 @@ public class NexaSearchBox : NexaInputHost
         SearchBoxKeyDown?.Invoke(this, e);
     }
 
-    private void UpdateClearButtonVisibility()
-    {
-        _clearButton.Visible = _showClearButton && !_edit.ReadOnly && _edit.TextLength > 0;
-    }
-
-    private void OnIconPaint(object? sender, PaintEventArgs e)
+    private void OnLeftIconPaint(object? sender, PaintEventArgs e)
     {
         var g = e.Graphics;
-        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
         var theme = ThemeManager.Current;
+        var palette = theme.Palette;
         var tint = Enabled
-            ? (Color)theme.Palette[NexaColorRole.TextSecondary].Value
-            : (Color)theme.Palette[NexaColorRole.TextDisabled].Value;
-        var size = NexaDpi.Scale(14, IsHandleCreated && !DesignMode ? NexaFormsDpi.CurrentDpi(this) : NexaDpi.BaseDpi);
+            ? InnerHasFocus()
+                ? (Color)palette[NexaColorRole.Primary].Value
+                : (Color)palette[NexaColorRole.TextSecondary].Value
+            : (Color)palette[NexaColorRole.TextDisabled].Value;
+        float dpi = CurrentDpi();
+        var size = NexaDpi.Scale(15, dpi);
         var bmp = NexaIconProvider.ToBitmap(NexaIconKind.Search, new Size(size, size), tint);
         if (bmp is null) return;
-        var x = (_iconPanel.Width - bmp.Width) / 2;
-        var y = (_iconPanel.Height - bmp.Height) / 2;
+        var x = (_leftIconPanel.Width - bmp.Width) / 2;
+        var y = (_leftIconPanel.Height - bmp.Height) / 2;
         g.DrawImage(bmp, x, y);
+    }
+
+    private void OnClearIconPaint(object? sender, PaintEventArgs e)
+    {
+        var g = e.Graphics;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        var theme = ThemeManager.Current;
+        var palette = theme.Palette;
+        var dpi = CurrentDpi();
+        var panel = _clearIconPanel.ClientRectangle;
+
+        if (_clearHovered)
+        {
+            var bg = Color.FromArgb(40, (Color)palette[NexaColorRole.TextPrimary].Value);
+            using var bgBrush = new SolidBrush(bg);
+            g.FillEllipse(bgBrush, panel);
+        }
+
+        var tint = _clearHovered
+            ? (Color)palette[NexaColorRole.TextPrimary].Value
+            : (Color)palette[NexaColorRole.TextSecondary].Value;
+        var size = NexaDpi.Scale(13, dpi);
+        var bmp = NexaIconProvider.ToBitmap(NexaIconKind.Cross, new Size(size, size), tint);
+        if (bmp is null) return;
+        g.DrawImage(bmp, (panel.Width - bmp.Width) / 2, (panel.Height - bmp.Height) / 2);
     }
 
     private void ApplyPlaceholder()
@@ -292,29 +321,28 @@ public class NexaSearchBox : NexaInputHost
         NativeMethods.SetCueBanner(_edit.Handle, _placeholderText ?? string.Empty);
     }
 
-    private void ApplyTheme(ITheme theme)
+    protected override void OnThemeApplied(ITheme theme)
     {
-        if (IsDisposed || Disposing) return;
+        base.OnThemeApplied(theme);
         var palette = theme.Palette;
         var typography = theme.Typography;
-        var dpi = IsHandleCreated && !DesignMode ? NexaFormsDpi.CurrentDpi(this) : NexaDpi.BaseDpi;
+        float dpi = CurrentDpi();
 
-        _edit.ForeColor = Enabled
-            ? (Color)palette[NexaColorRole.TextPrimary].Value
-            : (Color)palette[NexaColorRole.TextDisabled].Value;
-        _edit.BackColor = Style == NexaTextBoxStyle.Filled
+        var textColor = (Color)palette[NexaColorRole.TextPrimary].Value;
+        var disabled = (Color)palette[NexaColorRole.TextDisabled].Value;
+
+        _edit.ForeColor = Enabled ? textColor : disabled;
+        _edit.BackColor = Style == NexaInputStyle.Filled
             ? (Color)palette[NexaColorRole.SurfaceVariant].Value
-            : (Color)palette[NexaColorRole.Surface].Value;
+            : (Color)palette[NexaColorRole.InputBackground].Value;
         _edit.Font = typography.ToFont(NexaTypographyRole.Body, dpi);
 
-        _clearButton.ForeColor = (Color)palette[NexaColorRole.TextSecondary].Value;
-        _clearButton.BackColor = _edit.BackColor;
-
-        _iconPanel.Invalidate();
-        BorderHost.Invalidate();
+        _leftIconPanel.BackColor = _edit.BackColor;
+        _clearIconPanel.BackColor = _edit.BackColor;
+        _leftIconPanel.Invalidate();
+        _clearIconPanel.Invalidate();
+        LayoutInner();
     }
-
-    public bool IsDebounceActive => _debounceActive;
 }
 
 public sealed class SearchChangedEventArgs : System.EventArgs

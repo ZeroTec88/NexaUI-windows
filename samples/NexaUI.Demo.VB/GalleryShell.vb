@@ -14,7 +14,12 @@ Public NotInheritable Class GalleryShell
         ("getting-started", "Getting Started", Function() New GettingStartedScreen()),
         ("themes", "Themes", Function() New GalleryThemesScreen()),
         ("basic", "Basic Controls", Function() New GalleryBasicControlsScreen()),
-        ("input", "Input Controls", Function() New GalleryInputControlsScreen())
+        ("input", "Input Controls", Function() New GalleryInputControlsScreen()),
+        ("selection", "Selection Controls", Function() New GallerySelectionControlsScreen()),
+        ("layout", "Layout Controls", Function() New GalleryLayoutScreen()),
+        ("feedback", "Feedback Controls", Function() New GalleryFeedbackScreen()),
+        ("navigation", "Navigation Controls", Function() New GalleryNavigationScreen()),
+        ("dialogs", "Dialogs", Function() New GalleryDialogsScreen())
     }
 
     Private Shared ReadOnly NavItems As (Key As String, Title As String)() = {

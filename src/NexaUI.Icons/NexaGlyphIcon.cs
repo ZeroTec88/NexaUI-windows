@@ -102,6 +102,47 @@ public sealed class NexaGlyphIcon : INexaIconSource
                 graphics.FillEllipse(brush, rect.Left, rect.Top, rect.Width * 0.8F, rect.Height);
                 graphics.FillEllipse(new SolidBrush(Color.Transparent), rect.Left + rect.Width * 0.3F, rect.Top - rect.Height * 0.1F, rect.Width * 0.7F, rect.Height * 1.1F);
                 break;
+            case NexaIconKind.Question:
+                graphics.DrawEllipse(pen, rect.Left, rect.Top, rect.Width, rect.Height);
+                graphics.FillEllipse(brush, rect.Left + rect.Width * 0.45F - 1, rect.Top + rect.Height * 0.15F, 2 + pen.Width, 2 + pen.Width);
+                graphics.FillRectangle(brush, rect.Left + rect.Width * 0.45F - 1, rect.Top + rect.Height * 0.35F, 2 + pen.Width, rect.Height * 0.2F);
+                graphics.FillEllipse(brush, rect.Left + rect.Width * 0.45F - 1, rect.Top + rect.Height * 0.65F, 2 + pen.Width, 2 + pen.Width);
+                break;
+            case NexaIconKind.Exclamation:
+                graphics.DrawEllipse(pen, rect.Left, rect.Top, rect.Width, rect.Height);
+                graphics.FillEllipse(brush, rect.Left + rect.Width * 0.45F - 1, rect.Top + rect.Height * 0.15F, 2 + pen.Width, rect.Height * 0.55F);
+                graphics.FillEllipse(brush, rect.Left + rect.Width * 0.45F - 1, rect.Top + rect.Height * 0.75F, 2 + pen.Width, 2 + pen.Width);
+                break;
+            case NexaIconKind.Close:
+                graphics.DrawLine(pen, rect.Left + rect.Width * 0.2F, rect.Top + rect.Height * 0.2F, rect.Right - rect.Width * 0.2F, rect.Bottom - rect.Height * 0.2F);
+                graphics.DrawLine(pen, rect.Right - rect.Width * 0.2F, rect.Top + rect.Height * 0.2F, rect.Left + rect.Width * 0.2F, rect.Bottom - rect.Height * 0.2F);
+                break;
+            case NexaIconKind.Minimize:
+                graphics.DrawLine(pen, rect.Left + rect.Width * 0.2F, rect.Top + rect.Height * 0.6F, rect.Right - rect.Width * 0.2F, rect.Top + rect.Height * 0.6F);
+                break;
+            case NexaIconKind.Maximize:
+                graphics.DrawRectangle(pen, rect.Left + rect.Width * 0.2F, rect.Top + rect.Height * 0.2F, rect.Width * 0.6F, rect.Height * 0.6F);
+                break;
+            case NexaIconKind.Restore:
+                graphics.DrawRectangle(pen, rect.Left + rect.Width * 0.15F, rect.Top + rect.Height * 0.15F, rect.Width * 0.55F, rect.Height * 0.55F);
+                graphics.DrawRectangle(pen, rect.Left + rect.Width * 0.35F, rect.Top + rect.Height * 0.35F, rect.Width * 0.3F, rect.Height * 0.3F);
+                break;
+            case NexaIconKind.ChevronLeft:
+                graphics.DrawLines(pen, new[]
+                {
+                    new PointF(rect.Right - rect.Width * 0.25F, rect.Top),
+                    new PointF(rect.Left + pen.Width, rect.Top + rect.Height / 2),
+                    new PointF(rect.Right - rect.Width * 0.25F, rect.Bottom)
+                });
+                break;
+            case NexaIconKind.ChevronUp:
+                graphics.DrawLines(pen, new[]
+                {
+                    new PointF(rect.Left, rect.Bottom - rect.Height * 0.25F),
+                    new PointF(rect.Left + rect.Width / 2, rect.Top + pen.Width),
+                    new PointF(rect.Right, rect.Bottom - rect.Height * 0.25F)
+                });
+                break;
         }
 
         return bmp;

@@ -37,7 +37,24 @@ public static class ThemeManager
             previous = _current;
             _current = theme;
         }
-        ThemeChanged?.Invoke(null, new ThemeChangedEventArgs(previous, theme));
+        // Snapshot the invocation list so handlers that unsubscribe during
+        // invocation do not corrupt the multicast delegate.
+        var handler = ThemeChanged;
+        if (handler is not null)
+        {
+            foreach (var d in handler.GetInvocationList())
+            {
+                try
+                {
+                    ((System.EventHandler<ThemeChangedEventArgs>)d)!.Invoke(null, new ThemeChangedEventArgs(previous, theme));
+                }
+                catch
+                {
+                    // Swallow exceptions from individual handlers so one bad subscriber
+                    // does not prevent others from running.
+                }
+            }
+        }
     }
 
     /// <summary>Toggles between the built-in light and dark themes.</summary>

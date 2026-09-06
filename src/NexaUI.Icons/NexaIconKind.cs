@@ -13,12 +13,20 @@ public enum NexaIconKind
     Cross,
     ChevronDown,
     ChevronRight,
+    ChevronLeft,
+    ChevronUp,
     Search,
     Settings,
     User,
     Info,
     Warning,
     Error,
+    Question,
+    Exclamation,
     Sun,
-    Moon
+    Moon,
+    Close,
+    Minimize,
+    Maximize,
+    Restore
 }

@@ -8,9 +8,9 @@ using NexaUI.Themes;
 namespace NexaUI.Controls;
 
 /// <summary>
-/// A themed masked text input control. Hosts a native <see cref="MaskedTextBox"/> so all
-/// native masking behavior, validation, and accessibility remain intact. Adds themed borders,
-/// placeholder text, validation state, and helper/error text.
+/// A Bootstrap-style themed masked text input control. Hosts a native <see cref="MaskedTextBox"/>
+/// so all native masking behavior, validation, and accessibility remain intact. Adds themed
+/// borders, focus glow, validation icons, helper text, and an optional built-in label.
 /// </summary>
 [DefaultEvent(nameof(TextChanged))]
 [DefaultProperty(nameof(Mask))]
@@ -23,9 +23,10 @@ public class NexaMaskedTextBox : NexaInputHost
         TabStop = true;
         _edit = new MaskedTextBox
         {
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.None,
             BorderStyle = BorderStyle.None,
-            TabStop = false
+            TabStop = false,
+            BackColor = Color.White
         };
         _edit.TextChanged += (_, _) => TextChanged?.Invoke(this, EventArgs.Empty);
         _edit.MaskInputRejected += (_, e) => MaskInputRejected?.Invoke(this, e);
@@ -41,12 +42,9 @@ public class NexaMaskedTextBox : NexaInputHost
 
         BorderHost.Controls.Add(_edit);
 
-        ThemeManager.ThemeChanged += (_, e) => ApplyTheme(e.Current);
-        Disposed += (_, _) => ThemeManager.ThemeChanged -= OnSelfDisposed;
-        HandleCreated += (_, _) => ApplyTheme(ThemeManager.Current);
+        HandleCreated += (_, _) => LayoutInner();
+        BorderHost.Resize += (_, _) => LayoutInner();
     }
-
-    private void OnSelfDisposed(object? sender, EventArgs e) => ThemeManager.ThemeChanged -= OnSelfDisposed;
 
     [Browsable(false)]
     public MaskedTextBox InnerMaskedTextBox => _edit;
@@ -96,6 +94,11 @@ public class NexaMaskedTextBox : NexaInputHost
     public bool HideSelection { get => _edit.HideSelection; set => _edit.HideSelection = value; }
     public bool ReadOnly { get => _edit.ReadOnly; set => _edit.ReadOnly = value; }
     public bool Multiline { get => _edit.Multiline; set => _edit.Multiline = value; }
+    public new int MaxLength
+    {
+        get => _edit.MaxLength;
+        set { _edit.MaxLength = value; base.MaxLength = value; BorderHost.Invalidate(); }
+    }
 
     public bool MaskCompleted => _edit.MaskCompleted;
     public bool MaskFull => _edit.MaskFull;
@@ -128,6 +131,7 @@ public class NexaMaskedTextBox : NexaInputHost
     public void Undo() => _edit.Undo();
 
     protected override bool InnerHasFocus() => _edit.Focused;
+    protected override int InnerTextLength() => _edit.TextLength;
 
     protected override void OnGotFocus(System.EventArgs e)
     {
@@ -142,20 +146,43 @@ public class NexaMaskedTextBox : NexaInputHost
         BorderHost.Invalidate();
     }
 
+    private void LayoutInner()
+    {
+        if (BorderHost is null || BorderHost.Width == 0) return;
+        float dpi = CurrentDpi();
+        var inner = new Rectangle(0, 0, BorderHost.Width, BorderHost.Height);
+        var topPad = VerticalPaddingFor(dpi);
+        var sidePad = NexaDpi.Scale(12, dpi);
+        var rightReserved = HasValidationIcon() ? ValidationIconReservedWidth(dpi) : (ShowCounter ? CounterReservedWidth(dpi) : sidePad);
+
+        _edit.Bounds = new Rectangle(
+            inner.Left + sidePad,
+            inner.Top + topPad,
+            Math.Max(0, inner.Width - sidePad - rightReserved),
+            Math.Max(0, inner.Height - 2 * topPad));
+    }
+
+    protected override void OnThemeApplied(ITheme theme)
+    {
+        base.OnThemeApplied(theme);
+        ApplyTheme(theme);
+        LayoutInner();
+    }
+
     private void ApplyTheme(ITheme theme)
     {
         if (IsDisposed || Disposing) return;
         var palette = theme.Palette;
         var typography = theme.Typography;
-        var dpi = IsHandleCreated && !DesignMode ? NexaFormsDpi.CurrentDpi(this) : NexaDpi.BaseDpi;
+        float dpi = CurrentDpi();
 
         var textColor = (Color)palette[NexaColorRole.TextPrimary].Value;
         var disabled = (Color)palette[NexaColorRole.TextDisabled].Value;
 
         _edit.ForeColor = Enabled ? textColor : disabled;
-        _edit.BackColor = Style == NexaTextBoxStyle.Filled
+        _edit.BackColor = Style == NexaInputStyle.Filled
             ? (Color)palette[NexaColorRole.SurfaceVariant].Value
-            : (Color)palette[NexaColorRole.Surface].Value;
+            : (Color)palette[NexaColorRole.InputBackground].Value;
         _edit.Font = typography.ToFont(NexaTypographyRole.Body, dpi);
     }
 }

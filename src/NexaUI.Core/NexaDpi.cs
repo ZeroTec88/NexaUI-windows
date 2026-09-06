@@ -20,6 +20,8 @@ public static class NexaDpi
         return (int)Math.Round(dips * ScaleFactor(dpi));
     }
 
+    public static int Scale(int dips, int dpi) => Scale(dips, (float)dpi);
+
     public static float ScaleF(float dips, float dpi)
     {
         if (dips <= 0F) return 0F;

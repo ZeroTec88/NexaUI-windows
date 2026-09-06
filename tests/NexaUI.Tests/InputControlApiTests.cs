@@ -7,14 +7,14 @@ namespace NexaUI.Tests;
 public sealed class InputControlApiTests
 {
     [TestMethod]
-    public void NexaTextBox_Default_Style_Is_Default()
+    public void NexaTextBox_Default_Style_Is_Outline()
     {
         var prop = typeof(NexaUI.Controls.NexaTextBox).GetProperty(
             nameof(NexaUI.Controls.NexaTextBox.Style),
             BindingFlags.Public | BindingFlags.Instance);
         var attr = prop!.GetCustomAttribute<DefaultValueAttribute>();
         Assert.IsNotNull(attr);
-        Assert.AreEqual(NexaUI.Core.NexaTextBoxStyle.Default, attr!.Value);
+        Assert.AreEqual(NexaUI.Core.NexaInputStyle.Outline, attr!.Value);
     }
 
     [TestMethod]
@@ -89,10 +89,10 @@ public sealed class InputControlApiTests
     }
 
     [TestMethod]
-    public void NexaTextBox_Style_Defaults_To_Default()
+    public void NexaTextBox_Style_Defaults_To_Outline()
     {
         var tb = new NexaUI.Controls.NexaTextBox();
-        Assert.AreEqual(NexaUI.Core.NexaTextBoxStyle.Default, tb.Style);
+        Assert.AreEqual(NexaUI.Core.NexaInputStyle.Outline, tb.Style);
         tb.Dispose();
     }
 
@@ -114,11 +114,43 @@ public sealed class InputControlApiTests
     }
 
     [TestMethod]
-    public void NexaMaskedTextBox_Default_Style_Is_Default()
+    public void NexaMaskedTextBox_Default_Style_Is_Outline()
     {
         var mtb = new NexaUI.Controls.NexaMaskedTextBox();
-        Assert.AreEqual(NexaUI.Core.NexaTextBoxStyle.Default, mtb.Style);
+        Assert.AreEqual(NexaUI.Core.NexaInputStyle.Outline, mtb.Style);
         mtb.Dispose();
+    }
+
+    [TestMethod]
+    public void NexaTextBox_Has_Label_Property()
+    {
+        var tb = new NexaUI.Controls.NexaTextBox { Label = "Email" };
+        Assert.AreEqual("Email", tb.Label);
+        tb.Dispose();
+    }
+
+    [TestMethod]
+    public void NexaTextBox_Has_Helper_And_Error_Text()
+    {
+        var tb = new NexaUI.Controls.NexaTextBox
+        {
+            HelperText = "We'll never share it.",
+            ErrorText = "Invalid email"
+        };
+        Assert.AreEqual("We'll never share it.", tb.HelperText);
+        Assert.AreEqual("Invalid email", tb.ErrorText);
+        Assert.IsFalse(tb.HasError);
+        tb.ValidationState = NexaUI.Core.NexaTextValidationState.Error;
+        Assert.IsTrue(tb.HasError);
+        tb.Dispose();
+    }
+
+    [TestMethod]
+    public void NexaTextBox_Has_InputSize_Property()
+    {
+        var tb = new NexaUI.Controls.NexaTextBox { InputSize = NexaUI.Core.NexaInputSize.Large };
+        Assert.AreEqual(NexaUI.Core.NexaInputSize.Large, tb.InputSize);
+        tb.Dispose();
     }
 
     [TestMethod]

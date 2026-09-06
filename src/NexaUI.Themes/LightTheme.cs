@@ -99,10 +99,10 @@ public sealed class LightTheme : NexaThemeBase
         cornerRadiiInDips: new Dictionary<NexaCornerRadiusToken, int>
         {
             [NexaCornerRadiusToken.None] = 0,
-            [NexaCornerRadiusToken.Small] = 4,
-            [NexaCornerRadiusToken.Medium] = 8,
-            [NexaCornerRadiusToken.Large] = 12,
-            [NexaCornerRadiusToken.XLarge] = 18,
+            [NexaCornerRadiusToken.Small] = 1,
+            [NexaCornerRadiusToken.Medium] = 2,
+            [NexaCornerRadiusToken.Large] = 3,
+            [NexaCornerRadiusToken.XLarge] = 4,
             [NexaCornerRadiusToken.Pill] = 999
         },
         elevations: new Dictionary<NexaElevationLevel, NexaElevation>
