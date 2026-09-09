@@ -96,7 +96,7 @@ public sealed class GalleryDataPresentationScreen : UserControl
             Dock = DockStyle.Top,
             Height = 320,
             ReadOnly = true,
-            ShowRowNumbers = true,
+            ShowRowNumbers = false,
             AlternateRowColors = true,
             HeaderHeight = 36,
             RowHeight = 32,
@@ -162,12 +162,48 @@ public sealed class GalleryDataPresentationScreen : UserControl
         var toggleRowNumbers = new NexaButton { Text = "Toggle Row Numbers", Style = NexaButtonStyle.Secondary, AutoSize = true };
         toggleRowNumbers.Click += (_, _) => _grid.ShowRowNumbers = !_grid.ShowRowNumbers;
 
+        var toggleFilter = new NexaButton { Text = "Toggle Filter Row", Style = NexaButtonStyle.Secondary, AutoSize = true };
+        toggleFilter.Click += (_, _) => _grid.ShowFilterRow = !_grid.ShowFilterRow;
+
+        var toggleSearch = new NexaButton { Text = "Toggle Search", Style = NexaButtonStyle.Secondary, AutoSize = true };
+        toggleSearch.Click += (_, _) => _grid.ShowSearchPanel = !_grid.ShowSearchPanel;
+
+        var toggleSummary = new NexaButton { Text = "Toggle Summary", Style = NexaButtonStyle.Secondary, AutoSize = true };
+        toggleSummary.Click += (_, _) =>
+        {
+            _grid.ShowSummaryFooter = !_grid.ShowSummaryFooter;
+            if (_grid.ShowSummaryFooter)
+            {
+                _grid.SummaryItems.Clear();
+                _grid.SummaryItems.Add("Attendance", DataGridViewSummaryAggregate.Avg, "Avg Attendance: {0}");
+            }
+        };
+
+        var chooserBtn = new NexaButton { Text = "Column Chooser", Style = NexaButtonStyle.Secondary, AutoSize = true };
+        chooserBtn.Click += (_, _) => _grid.ShowColumnChooser();
+
+        var exportBtn = new NexaButton { Text = "Export CSV", Style = NexaButtonStyle.Primary, AutoSize = true };
+        exportBtn.Click += (_, _) =>
+        {
+            using var sfd = new SaveFileDialog { Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*", FileName = "students.csv" };
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                _grid.ExportToCsv(sfd.FileName);
+                MessageBox.Show("Exported successfully.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        };
+
         _selectedLabel = new Label { Text = "Selected: None", AutoSize = true, Margin = new Padding(12, 0, 0, 0) };
         _gridStyleLabel = new Label { Text = "GridStyle: Default", AutoSize = true, Margin = new Padding(12, 0, 0, 0) };
 
         controls.Controls.Add(new Label { Text = "Style:", AutoSize = true, Margin = new Padding(0, 4, 4, 0) });
         controls.Controls.Add(styleCombo);
         controls.Controls.Add(toggleRowNumbers);
+        controls.Controls.Add(toggleFilter);
+        controls.Controls.Add(toggleSearch);
+        controls.Controls.Add(toggleSummary);
+        controls.Controls.Add(chooserBtn);
+        controls.Controls.Add(exportBtn);
         controls.Controls.Add(_selectedLabel);
         controls.Controls.Add(_gridStyleLabel);
 
@@ -278,9 +314,9 @@ public sealed class GalleryDataPresentationScreen : UserControl
         var advancedGrid = new NexaDataGridView
         {
             Dock = DockStyle.Top,
-            Height = 280,
-            ReadOnly = false,
-            ShowRowNumbers = true,
+            Height = 300,
+            ReadOnly = true,
+            ShowRowNumbers = false,
             AlternateRowColors = true,
             HeaderHeight = 36,
             RowHeight = 32,
@@ -291,7 +327,10 @@ public sealed class GalleryDataPresentationScreen : UserControl
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
             MultiSelect = false,
             AllowUserToAddRows = false,
-            AllowUserToDeleteRows = false
+            AllowUserToDeleteRows = false,
+            ShowFilterRow = true,
+            ShowSearchPanel = true,
+            ShowSummaryFooter = true
         };
 
         advancedGrid.Columns.Add("Id", "Student ID");
@@ -300,6 +339,8 @@ public sealed class GalleryDataPresentationScreen : UserControl
         advancedGrid.Columns.Add("Batch", "Batch");
         advancedGrid.Columns.Add("Status", "Status");
         advancedGrid.Columns.Add("Attendance", "Attendance");
+
+        advancedGrid.SummaryItems.Add("Attendance", DataGridViewSummaryAggregate.Avg, "Avg: {0}%");
 
         var students = GenerateStudents();
         foreach (var s in students)
@@ -336,7 +377,7 @@ public sealed class GalleryDataPresentationScreen : UserControl
         var addButton = new NexaButton { Text = "Add Student", Style = NexaButtonStyle.Primary, AutoSize = true };
         addButton.Click += (_, _) =>
         {
-            advancedGrid.Rows.Add(students.Count + 1, "New Student", "ICT", "2025-A", "Active", "0%");
+            advancedGrid.Rows.Add((students.Count + 1).ToString(), "New Student", "ICT", "2025-A", "Active", "0%");
         };
 
         topBar.Controls.Add(searchBox, 0, 0);

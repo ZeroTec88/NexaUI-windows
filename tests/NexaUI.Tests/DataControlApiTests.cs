@@ -75,6 +75,80 @@ public sealed class DataControlApiTests
         grid.Dispose(); // Double dispose safe
     }
 
+    [TestMethod]
+    public void NexaDataGridView_New_Features_Default_False()
+    {
+        var grid = new NexaDataGridView();
+        Assert.IsFalse(grid.ShowFilterRow);
+        Assert.IsFalse(grid.ShowSearchPanel);
+        Assert.IsFalse(grid.ShowSummaryFooter);
+        Assert.IsTrue(grid.ShowContextMenu);
+        Assert.IsTrue(grid.EnableColumnPinning);
+        Assert.IsTrue(grid.EnableMultiColumnSort);
+        Assert.IsNotNull(grid.SummaryItems);
+        Assert.AreEqual(0, grid.SummaryItems.Count);
+        grid.Dispose();
+    }
+
+    [TestMethod]
+    public void NexaDataGridView_Feature_Toggle_Roundtrip()
+    {
+        var grid = new NexaDataGridView();
+        grid.ShowFilterRow = true;
+        Assert.IsTrue(grid.ShowFilterRow);
+        grid.ShowSearchPanel = true;
+        Assert.IsTrue(grid.ShowSearchPanel);
+        grid.ShowSummaryFooter = true;
+        Assert.IsTrue(grid.ShowSummaryFooter);
+        grid.ShowContextMenu = false;
+        Assert.IsFalse(grid.ShowContextMenu);
+        grid.EnableColumnPinning = false;
+        Assert.IsFalse(grid.EnableColumnPinning);
+        grid.EnableMultiColumnSort = false;
+        Assert.IsFalse(grid.EnableMultiColumnSort);
+        grid.Dispose();
+    }
+
+    [TestMethod]
+    public void NexaDataGridView_SummaryItems_Add_And_Clear()
+    {
+        var grid = new NexaDataGridView();
+        grid.Columns.Add("Value", "Value");
+        var item = grid.SummaryItems.Add("Value", DataGridViewSummaryAggregate.Sum, "{0}");
+        Assert.IsNotNull(item);
+        Assert.AreEqual(1, grid.SummaryItems.Count);
+        Assert.AreEqual(DataGridViewSummaryAggregate.Sum, item.Aggregate);
+        grid.SummaryItems.Clear();
+        Assert.AreEqual(0, grid.SummaryItems.Count);
+        grid.Dispose();
+    }
+
+    [TestMethod]
+    public void NexaDataGridView_ExportToCsv_Does_Not_Throw()
+    {
+        var grid = new NexaDataGridView();
+        grid.Columns.Add("Name", "Name");
+        grid.Rows.Add("Alice");
+        grid.Rows.Add("Bob");
+
+        var tempPath = Path.Combine(Path.GetTempPath(), "nexa_test.csv");
+        try
+        {
+            grid.ExportToCsv(tempPath);
+            Assert.IsTrue(File.Exists(tempPath));
+            var content = File.ReadAllText(tempPath);
+            Assert.IsTrue(content.Contains("Name"));
+            Assert.IsTrue(content.Contains("Alice"));
+            Assert.IsTrue(content.Contains("Bob"));
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
+            grid.Dispose();
+        }
+    }
+
     // -------- NexaListView --------
 
     [TestMethod]

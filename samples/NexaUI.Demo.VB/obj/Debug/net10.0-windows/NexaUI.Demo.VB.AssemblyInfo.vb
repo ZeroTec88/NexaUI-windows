@@ -15,7 +15,7 @@ Imports System.Reflection
 <Assembly: System.Reflection.AssemblyCompanyAttribute("NexaUI.Demo.VB"),  _
  Assembly: System.Reflection.AssemblyConfigurationAttribute("Debug"),  _
  Assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0"),  _
- Assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7cdd5e880d6fdc3071f05f2079f65a6fa4d6bdfd"),  _
+ Assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+188272a5d3805034b2a8b828fc2ad01d66994728"),  _
  Assembly: System.Reflection.AssemblyProductAttribute("NexaUI.Demo.VB"),  _
  Assembly: System.Reflection.AssemblyTitleAttribute("NexaUI.Demo.VB"),  _
  Assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0"),  _

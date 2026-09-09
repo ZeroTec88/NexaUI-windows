@@ -81,7 +81,7 @@ Public NotInheritable Class GalleryDataPresentationScreen
             .Dock = DockStyle.Top,
             .Height = 320,
             .ReadOnly = True,
-            .ShowRowNumbers = True,
+            .ShowRowNumbers = False,
             .AlternateRowColors = True,
             .HeaderHeight = 36,
             .RowHeight = 32,
@@ -136,12 +136,45 @@ Public NotInheritable Class GalleryDataPresentationScreen
         Dim toggleRowNumbers = New NexaButton With {.Text = "Toggle Row Numbers", .Style = NexaButtonStyle.Secondary, .AutoSize = True}
         AddHandler toggleRowNumbers.Click, Sub(sender, e) _grid.ShowRowNumbers = Not _grid.ShowRowNumbers
 
+        Dim toggleFilter = New NexaButton With {.Text = "Toggle Filter Row", .Style = NexaButtonStyle.Secondary, .AutoSize = True}
+        AddHandler toggleFilter.Click, Sub(sender, e) _grid.ShowFilterRow = Not _grid.ShowFilterRow
+
+        Dim toggleSearch = New NexaButton With {.Text = "Toggle Search", .Style = NexaButtonStyle.Secondary, .AutoSize = True}
+        AddHandler toggleSearch.Click, Sub(sender, e) _grid.ShowSearchPanel = Not _grid.ShowSearchPanel
+
+        Dim toggleSummary = New NexaButton With {.Text = "Toggle Summary", .Style = NexaButtonStyle.Secondary, .AutoSize = True}
+        AddHandler toggleSummary.Click, Sub(sender, e)
+                                                  _grid.ShowSummaryFooter = Not _grid.ShowSummaryFooter
+                                                  If _grid.ShowSummaryFooter Then
+                                                      _grid.SummaryItems.Clear()
+                                                      _grid.SummaryItems.Add("Attendance", DataGridViewSummaryAggregate.Avg, "Avg: {0}%")
+                                                  End If
+                                              End Sub
+
+        Dim chooserBtn = New NexaButton With {.Text = "Column Chooser", .Style = NexaButtonStyle.Secondary, .AutoSize = True}
+        AddHandler chooserBtn.Click, Sub(sender, e) _grid.ShowColumnChooser()
+
+        Dim exportBtn = New NexaButton With {.Text = "Export CSV", .Style = NexaButtonStyle.Primary, .AutoSize = True}
+        AddHandler exportBtn.Click, Sub(sender, e)
+                                            Using sfd = New SaveFileDialog With {.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*", .FileName = "students.csv"}
+                                                If sfd.ShowDialog() = DialogResult.OK Then
+                                                    _grid.ExportToCsv(sfd.FileName)
+                                                    MessageBox.Show("Exported successfully.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                                End If
+                                            End Using
+                                        End Sub
+
         _selectedLabel = New Label With {.Text = "Selected: None", .AutoSize = True, .Margin = New Padding(12, 0, 0, 0)}
         _gridStyleLabel = New Label With {.Text = "GridStyle: Default", .AutoSize = True, .Margin = New Padding(12, 0, 0, 0)}
 
         controls.Controls.Add(New Label With {.Text = "Style:", .AutoSize = True, .Margin = New Padding(0, 4, 4, 0)})
         controls.Controls.Add(styleCombo)
         controls.Controls.Add(toggleRowNumbers)
+        controls.Controls.Add(toggleFilter)
+        controls.Controls.Add(toggleSearch)
+        controls.Controls.Add(toggleSummary)
+        controls.Controls.Add(chooserBtn)
+        controls.Controls.Add(exportBtn)
         controls.Controls.Add(_selectedLabel)
         controls.Controls.Add(_gridStyleLabel)
 
@@ -244,9 +277,9 @@ Public NotInheritable Class GalleryDataPresentationScreen
 
         Dim advancedGrid = New NexaDataGridView With {
             .Dock = DockStyle.Top,
-            .Height = 280,
+            .Height = 300,
             .ReadOnly = False,
-            .ShowRowNumbers = True,
+            .ShowRowNumbers = False,
             .AlternateRowColors = True,
             .HeaderHeight = 36,
             .RowHeight = 32,
@@ -257,7 +290,10 @@ Public NotInheritable Class GalleryDataPresentationScreen
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect,
             .MultiSelect = False,
             .AllowUserToAddRows = False,
-            .AllowUserToDeleteRows = False
+            .AllowUserToDeleteRows = False,
+            .ShowFilterRow = True,
+            .ShowSearchPanel = True,
+            .ShowSummaryFooter = True
         }
 
         advancedGrid.Columns.Add("Id", "Student ID")
@@ -266,6 +302,8 @@ Public NotInheritable Class GalleryDataPresentationScreen
         advancedGrid.Columns.Add("Batch", "Batch")
         advancedGrid.Columns.Add("Status", "Status")
         advancedGrid.Columns.Add("Attendance", "Attendance")
+
+        advancedGrid.SummaryItems.Add("Attendance", DataGridViewSummaryAggregate.Avg, "Avg: {0}%")
 
         Dim students = GenerateStudents()
         For Each s In students
@@ -299,7 +337,7 @@ Public NotInheritable Class GalleryDataPresentationScreen
 
         Dim addButton = New NexaButton With {.Text = "Add Student", .Style = NexaButtonStyle.Primary, .AutoSize = True}
         AddHandler addButton.Click, Sub(sender, e)
-                                         advancedGrid.Rows.Add(students.Count + 1, "New Student", "ICT", "2025-A", "Active", "0%")
+                                         advancedGrid.Rows.Add((students.Count + 1).ToString(), "New Student", "ICT", "2025-A", "Active", "0%")
                                      End Sub
 
         topBar.Controls.Add(searchBox, 0, 0)

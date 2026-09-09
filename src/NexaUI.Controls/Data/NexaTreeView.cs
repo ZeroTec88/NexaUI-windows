@@ -29,15 +29,6 @@ public class NexaTreeView : TreeView
     /// </summary>
     public NexaTreeView()
     {
-        SetStyle(
-            ControlStyles.UserPaint |
-            ControlStyles.AllPaintingInWmPaint |
-            ControlStyles.OptimizedDoubleBuffer |
-            ControlStyles.ResizeRedraw |
-            ControlStyles.Selectable,
-            true);
-
-        DoubleBuffered = true;
         HideSelection = false;
         BorderStyle = BorderStyle.None;
         ShowLines = true;
@@ -45,6 +36,7 @@ public class NexaTreeView : TreeView
         ShowRootLines = true;
         FullRowSelect = true;
         HotTracking = true;
+        DrawMode = TreeViewDrawMode.OwnerDrawText;
 
         ThemeManager.ThemeChanged += OnThemeChanged;
         Disposed += (_, _) => ThemeManager.ThemeChanged -= OnThemeChanged;
@@ -131,7 +123,7 @@ public class NexaTreeView : TreeView
 
         LineColor = (Color)palette[NexaColorRole.Border].Value;
 
-        DrawMode = TreeViewDrawMode.OwnerDrawAll;
+        DrawMode = TreeViewDrawMode.OwnerDrawText;
         if (!_ownerDrawInitialized)
         {
             DrawNode += OnDrawNode;
@@ -149,105 +141,35 @@ public class NexaTreeView : TreeView
         var dpi = GetCurrentDpi();
 
         var node = e.Node;
-        var bounds = e.Bounds;
         var isSelected = (e.State & TreeNodeStates.Selected) == TreeNodeStates.Selected;
         var isHot = (e.State & TreeNodeStates.Hot) == TreeNodeStates.Hot;
-        var isFocused = Focused && isSelected;
-        var isExpanded = node.IsExpanded;
-        var level = GetNodeLevel(node);
 
-        Color bg;
         Color fg;
-
         if (isSelected && Focused)
         {
-            bg = (Color)palette[NexaColorRole.Primary].Value;
             fg = (Color)palette[NexaColorRole.TextOnAccent].Value;
         }
         else if (isSelected && !Focused)
         {
-            bg = (Color)palette[NexaColorRole.Primary].Subtle.Value;
             fg = (Color)palette[NexaColorRole.Primary].Value;
         }
         else if (isHot)
         {
-            bg = (Color)palette[NexaColorRole.SurfaceVariant].Value;
             fg = (Color)palette[NexaColorRole.TextPrimary].Value;
         }
         else
         {
-            bg = (Color)palette[NexaColorRole.Surface].Value;
             fg = (Color)palette[NexaColorRole.TextPrimary].Value;
         }
 
-        using (var brush = new SolidBrush(bg))
-        {
-            e.Graphics.FillRectangle(brush, bounds);
-        }
-
-        var indentSize = Indent;
-        var iconSize = NexaDpi.Scale(16, dpi);
-        var plusMinusSize = NexaDpi.Scale(14, dpi);
-        var lineWidth = NexaDpi.Scale(1, dpi);
-        var lineColor = (Color)palette[NexaColorRole.Border].Value;
-
-        var x = bounds.Left + level * indentSize;
-
-        if (ShowLines)
-        {
-            DrawTreeLines(e.Graphics, node, bounds, x, lineWidth, lineColor, dpi);
-        }
-
-        var plusMinusRect = new Rectangle(
-            x - plusMinusSize - NexaDpi.Scale(4, dpi),
-            bounds.Top + (bounds.Height - plusMinusSize) / 2,
-            plusMinusSize, plusMinusSize);
-
-        if (node.Nodes.Count > 0)
-        {
-            DrawPlusMinus(e.Graphics, plusMinusRect, isExpanded, fg, dpi);
-        }
-
-        x = plusMinusRect.Right + NexaDpi.Scale(4, dpi);
-
-        if (ImageList != null && node.ImageIndex >= 0 && node.ImageIndex < ImageList.Images.Count)
-        {
-            var img = ImageList.Images[node.ImageIndex];
-            var imgRect = new Rectangle(x, bounds.Top + (bounds.Height - iconSize) / 2, iconSize, iconSize);
-            e.Graphics.DrawImage(img, imgRect);
-            x += iconSize + NexaDpi.Scale(6, dpi);
-        }
-        else if (node.Nodes.Count > 0)
-        {
-            x += NexaDpi.Scale(6, dpi);
-        }
-
-        var textRect = new Rectangle(x, bounds.Top, bounds.Right - x - NexaDpi.Scale(8, dpi), bounds.Height);
         using var font = theme.Typography.ToFont(NexaTypographyRole.Body, dpi);
-
-        if (CheckBoxes)
-        {
-            var checkSize = NexaDpi.Scale(16, dpi);
-            var checkRect = new Rectangle(x, bounds.Top + (bounds.Height - checkSize) / 2, checkSize, checkSize);
-            DrawCheckBox(e.Graphics, checkRect, node.Checked, fg);
-            textRect.X = checkRect.Right + NexaDpi.Scale(6, dpi);
-            textRect.Width = bounds.Right - textRect.X - NexaDpi.Scale(8, dpi);
-        }
-
         TextRenderer.DrawText(
             e.Graphics,
             node.Text,
             font,
-            textRect,
+            e.Bounds,
             fg,
             TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.SingleLine);
-
-        if (isFocused && ShowFocusCues)
-        {
-            using var focusPen = new Pen((Color)palette[NexaColorRole.Focus].Value, NexaDpi.Scale(1, dpi));
-            var focusRect = Rectangle.Inflate(bounds, -NexaDpi.Scale(2, dpi), -NexaDpi.Scale(2, dpi));
-            e.Graphics.DrawRectangle(focusPen, focusRect);
-        }
     }
 
     private void DrawTreeLines(Graphics g, TreeNode node, Rectangle bounds, int x, int lineWidth, Color lineColor, float dpi)
