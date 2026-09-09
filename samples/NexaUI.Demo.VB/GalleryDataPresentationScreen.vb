@@ -386,8 +386,9 @@ Public NotInheritable Class GalleryDataPresentationScreen
 
         Dim advancedGrid = New NexaDataGridView With {
             .Dock = DockStyle.Top,
-            .Height = 300,
+            .Height = 320,
             .ReadOnly = False,
+            .EnableInlineEditing = True,
             .ShowRowNumbers = False,
             .AlternateRowColors = True,
             .HeaderHeight = 36,
@@ -397,12 +398,13 @@ Public NotInheritable Class GalleryDataPresentationScreen
             .RowCornerRadius = 0,
             .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-            .MultiSelect = False,
-            .AllowUserToAddRows = False,
-            .AllowUserToDeleteRows = False,
+            .MultiSelect = True,
+            .AllowUserToAddRows = True,
+            .AllowUserToDeleteRows = True,
             .ShowFilterRow = True,
             .ShowSearchPanel = True,
-            .ShowSummaryFooter = True
+            .ShowSummaryFooter = True,
+            .ShowCommandColumn = True
         }
 
         advancedGrid.Columns.Add("Id", "Student ID")

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -39,12 +40,15 @@ public class NexaDataGridView : DataGridView
     private bool _showContextMenu = true;
     private bool _enableColumnPinning = true;
     private bool _enableMultiColumnSort = true;
+    private bool _showCommandColumn = false;
+    private bool _enableInlineEditing = true;
 
     private Panel? _filterPanel;
     private Dictionary<DataGridViewColumn, TextBox>? _filterBoxes;
     private Panel? _searchPanel;
     private TextBox? _searchBox;
     private Panel? _summaryPanel;
+    private Panel? _statusPanel;
     private ContextMenuStrip? _contextMenu;
     private DataGridViewSummaryItemCollection? _summaryItems;
 
@@ -340,6 +344,41 @@ public class NexaDataGridView : DataGridView
     }
 
     /// <summary>
+    /// Gets or sets whether a command column with Edit/Delete buttons is shown.
+    /// </summary>
+    [Category("NexaUI")]
+    [DefaultValue(false)]
+    [Description("Show a command column with per-row Edit and Delete buttons.")]
+    public bool ShowCommandColumn
+    {
+        get => _showCommandColumn;
+        set
+        {
+            if (_showCommandColumn == value) return;
+            _showCommandColumn = value;
+            ApplyCommandColumn();
+            Invalidate();
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets whether inline editing is enabled for the grid.
+    /// </summary>
+    [Category("NexaUI")]
+    [DefaultValue(true)]
+    [Description("Allow inline editing of cells when a cell is clicked.")]
+    public bool EnableInlineEditing
+    {
+        get => _enableInlineEditing;
+        set
+        {
+            _enableInlineEditing = value;
+            ReadOnly = !value;
+            Invalidate();
+        }
+    }
+
+    /// <summary>
     /// Gets the collection of summary items for the footer.
     /// </summary>
     [Category("NexaUI")]
@@ -464,6 +503,7 @@ public class NexaDataGridView : DataGridView
         EnsureFilterPanel();
         EnsureSearchPanel();
         EnsureSummaryPanel();
+        EnsureStatusPanel();
         EnsureContextMenu();
     }
 
@@ -475,7 +515,36 @@ public class NexaDataGridView : DataGridView
             EnsureFilterPanel();
             EnsureSearchPanel();
             EnsureSummaryPanel();
+            EnsureStatusPanel();
             EnsureContextMenu();
+        }
+    }
+
+    protected override void OnCellContentClick(DataGridViewCellEventArgs e)
+    {
+        base.OnCellContentClick(e);
+
+        if (e.ColumnIndex >= 0 && e.ColumnIndex < Columns.Count && Columns[e.ColumnIndex].Name == "NexaCommandColumn")
+        {
+            if (e.RowIndex >= 0 && e.RowIndex < Rows.Count && !Rows[e.RowIndex].IsNewRow)
+            {
+                var cellRect = GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+                var editBtnRect = new Rectangle(cellRect.Left, cellRect.Top, cellRect.Width / 2 - 1, cellRect.Height);
+                var deleteBtnRect = new Rectangle(cellRect.Left + cellRect.Width / 2 + 1, cellRect.Top, cellRect.Width / 2 - 1, cellRect.Height);
+
+                if (editBtnRect.Contains(PointToClient(Cursor.Position)))
+                {
+                    CurrentCell = Rows[e.RowIndex].Cells[0];
+                    EditCurrentRecord();
+                }
+                else if (deleteBtnRect.Contains(PointToClient(Cursor.Position)))
+                {
+                    CurrentCell = Rows[e.RowIndex].Cells[0];
+                    ClearSelection();
+                    Rows[e.RowIndex].Selected = true;
+                    DeleteSelectedRecords();
+                }
+            }
         }
     }
 
@@ -524,24 +593,39 @@ public class NexaDataGridView : DataGridView
     {
         base.OnRowsAdded(e);
         if (_showRowNumbers) RefreshRowNumbers();
+        UpdateStatusPanel();
     }
 
     protected override void OnRowsRemoved(DataGridViewRowsRemovedEventArgs e)
     {
         base.OnRowsRemoved(e);
         if (_showRowNumbers) RefreshRowNumbers();
+        UpdateStatusPanel();
     }
 
     protected override void OnSorted(EventArgs e)
     {
         base.OnSorted(e);
         if (_showRowNumbers) RefreshRowNumbers();
+        UpdateStatusPanel();
     }
 
     protected override void OnRowHeaderMouseClick(DataGridViewCellMouseEventArgs e)
     {
         base.OnRowHeaderMouseClick(e);
         if (_showRowNumbers) RefreshRowNumbers();
+    }
+
+    protected override void OnCurrentCellChanged(EventArgs e)
+    {
+        base.OnCurrentCellChanged(e);
+        UpdateStatusPanel();
+    }
+
+    protected override void OnCellValueChanged(DataGridViewCellEventArgs e)
+    {
+        base.OnCellValueChanged(e);
+        UpdateStatusPanel();
     }
 
     protected override void OnColumnDisplayIndexChanged(DataGridViewColumnEventArgs e)
@@ -597,6 +681,11 @@ public class NexaDataGridView : DataGridView
         {
             HighlightSearchResults(e.Graphics, _searchBox.Text);
         }
+
+        if (_showCommandColumn)
+        {
+            PaintCommandButtons(e.Graphics);
+        }
     }
 
     #endregion
@@ -618,19 +707,47 @@ public class NexaDataGridView : DataGridView
         ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
         AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+        EnableHeadersVisualStyles = false;
     }
 
     private void ApplyGridStyle()
     {
-        var dpi = GetCurrentDpi();
-        CellBorderStyle = _gridStyle == NexaGridStyle.Compact ? DataGridViewCellBorderStyle.None :
-                          _gridStyle == NexaGridStyle.Comfortable ? DataGridViewCellBorderStyle.SingleHorizontal :
-                          DataGridViewCellBorderStyle.SingleHorizontal;
+        CellBorderStyle = _gridStyle switch
+        {
+            NexaGridStyle.Compact => DataGridViewCellBorderStyle.None,
+            NexaGridStyle.Comfortable => DataGridViewCellBorderStyle.SingleHorizontal,
+            _ => DataGridViewCellBorderStyle.SingleHorizontal
+        };
     }
 
     private void ApplyHeaderStyle()
     {
         EnableHeadersVisualStyles = false;
+    }
+
+    private void ApplyCommandColumn()
+    {
+        if (_showCommandColumn)
+        {
+            if (Columns.Contains("NexaCommandColumn")) return;
+
+            var cmdCol = new DataGridViewButtonColumn
+            {
+                Name = "NexaCommandColumn",
+                HeaderText = "Actions",
+                Width = NexaDpi.Scale(140, GetCurrentDpi()),
+                ReadOnly = true,
+                SortMode = DataGridViewColumnSortMode.NotSortable,
+                Resizable = DataGridViewTriState.False,
+                FlatStyle = FlatStyle.Flat
+            };
+            Columns.Add(cmdCol);
+        }
+        else
+        {
+            if (Columns.Contains("NexaCommandColumn"))
+                Columns.Remove("NexaCommandColumn");
+        }
     }
 
     private void ApplyHeaderHeight()
@@ -668,6 +785,8 @@ public class NexaDataGridView : DataGridView
         DefaultCellStyle.ForeColor = (Color)palette[NexaColorRole.TextPrimary].Value;
         DefaultCellStyle.SelectionBackColor = (Color)palette[NexaColorRole.Primary].Value;
         DefaultCellStyle.SelectionForeColor = (Color)palette[NexaColorRole.TextOnAccent].Value;
+        DefaultCellStyle.Font = theme.Typography.ToFont(NexaTypographyRole.Body, GetCurrentDpi());
+        DefaultCellStyle.Padding = new Padding(NexaDpi.Scale(8, GetCurrentDpi()), 0, NexaDpi.Scale(8, GetCurrentDpi()), 0);
 
         AlternatingRowsDefaultCellStyle.BackColor = _alternateRowColors
             ? (Color)palette[NexaColorRole.SurfaceVariant].Value
@@ -675,21 +794,27 @@ public class NexaDataGridView : DataGridView
         AlternatingRowsDefaultCellStyle.ForeColor = (Color)palette[NexaColorRole.TextPrimary].Value;
         AlternatingRowsDefaultCellStyle.SelectionBackColor = (Color)palette[NexaColorRole.Primary].Value;
         AlternatingRowsDefaultCellStyle.SelectionForeColor = (Color)palette[NexaColorRole.TextOnAccent].Value;
+        AlternatingRowsDefaultCellStyle.Font = theme.Typography.ToFont(NexaTypographyRole.Body, GetCurrentDpi());
+        AlternatingRowsDefaultCellStyle.Padding = DefaultCellStyle.Padding;
 
         ColumnHeadersDefaultCellStyle.BackColor = _headerStyle == NexaHeaderStyle.Minimal
-            ? Color.Transparent
-            : (Color)palette[NexaColorRole.Surface].Value;
+            ? (Color)palette[NexaColorRole.Surface].Value
+            : (Color)palette[NexaColorRole.Primary].Value;
         ColumnHeadersDefaultCellStyle.ForeColor = _headerStyle == NexaHeaderStyle.Emphasized
-            ? (Color)palette[NexaColorRole.Primary].Value
-            : (Color)palette[NexaColorRole.TextPrimary].Value;
+            ? (Color)palette[NexaColorRole.TextOnAccent].Value
+            : _headerStyle == NexaHeaderStyle.Minimal
+                ? (Color)palette[NexaColorRole.TextPrimary].Value
+                : (Color)palette[NexaColorRole.TextOnAccent].Value;
         ColumnHeadersDefaultCellStyle.SelectionBackColor = ColumnHeadersDefaultCellStyle.BackColor;
         ColumnHeadersDefaultCellStyle.SelectionForeColor = ColumnHeadersDefaultCellStyle.ForeColor;
         ColumnHeadersDefaultCellStyle.Font = theme.Typography.ToFont(NexaTypographyRole.BodyStrong, GetCurrentDpi());
+        ColumnHeadersDefaultCellStyle.Padding = new Padding(NexaDpi.Scale(8, GetCurrentDpi()), 0, NexaDpi.Scale(8, GetCurrentDpi()), 0);
 
         RowHeadersDefaultCellStyle.BackColor = (Color)palette[NexaColorRole.Surface].Value;
         RowHeadersDefaultCellStyle.ForeColor = (Color)palette[NexaColorRole.TextSecondary].Value;
         RowHeadersDefaultCellStyle.SelectionBackColor = (Color)palette[NexaColorRole.Primary].Value;
         RowHeadersDefaultCellStyle.SelectionForeColor = (Color)palette[NexaColorRole.TextOnAccent].Value;
+        RowHeadersDefaultCellStyle.Font = theme.Typography.ToFont(NexaTypographyRole.Body, GetCurrentDpi());
 
         GridColor = _showHorizontalGridLines || _showVerticalGridLines
             ? (Color)palette[NexaColorRole.Border].Value
@@ -697,9 +822,11 @@ public class NexaDataGridView : DataGridView
 
         ApplyHeaderHeight();
         ApplyRowHeight();
+        ApplyGridStyle();
         ApplyFilterTheme();
         ApplySearchTheme();
         ApplySummaryTheme();
+        ApplyStatusTheme();
         Invalidate();
     }
 
@@ -722,6 +849,24 @@ public class NexaDataGridView : DataGridView
     }
 
     #region Row Numbers
+
+    private static GraphicsPath CreateRoundedRect(Rectangle rect, int radius)
+    {
+        var path = new GraphicsPath();
+        if (radius <= 0 || rect.Width <= 0 || rect.Height <= 0)
+        {
+            path.AddRectangle(rect);
+            return path;
+        }
+
+        var d = Math.Min(radius * 2, Math.Min(rect.Width, rect.Height));
+        path.AddArc(rect.X, rect.Y, d, d, 180, 90);
+        path.AddArc(rect.Right - d, rect.Y, d, d, 270, 90);
+        path.AddArc(rect.Right - d, rect.Bottom - d, d, d, 0, 90);
+        path.AddArc(rect.X, rect.Bottom - d, d, d, 90, 90);
+        path.CloseFigure();
+        return path;
+    }
 
     private void RefreshRowNumbers()
     {
@@ -832,6 +977,7 @@ public class NexaDataGridView : DataGridView
     {
         if (_filterPanel == null || IsDisposed || Disposing) return;
         var palette = ThemeManager.Current.Palette;
+        var dpi = GetCurrentDpi();
         _filterPanel.BackColor = (Color)palette[NexaColorRole.Surface].Value;
 
         foreach (Control ctrl in _filterPanel.Controls)
@@ -842,16 +988,20 @@ public class NexaDataGridView : DataGridView
                 {
                     if (item is Panel p)
                     {
+                        p.Padding = new Padding(NexaDpi.Scale(6, dpi));
+                        p.Margin = new Padding(NexaDpi.Scale(3, dpi));
                         foreach (Control inner in p.Controls)
                         {
                             if (inner is TextBox tb)
                             {
+                                tb.BorderStyle = BorderStyle.FixedSingle;
                                 tb.BackColor = (Color)palette[NexaColorRole.InputBackground].Value;
                                 tb.ForeColor = (Color)palette[NexaColorRole.TextPrimary].Value;
                             }
                             else if (inner is Label lbl)
                             {
                                 lbl.ForeColor = (Color)palette[NexaColorRole.TextSecondary].Value;
+                                lbl.Font = ThemeManager.Current.Typography.ToFont(NexaTypographyRole.Caption, dpi);
                             }
                         }
                     }
@@ -916,6 +1066,15 @@ public class NexaDataGridView : DataGridView
         };
         _searchBox.TextChanged += (_, __) => Invalidate();
 
+        var searchIcon = new Label
+        {
+            Text = "🔍",
+            Dock = DockStyle.Left,
+            AutoSize = true,
+            Margin = new Padding(0),
+            TextAlign = ContentAlignment.MiddleCenter
+        };
+
         var clearBtn = new Label
         {
             Text = "✕",
@@ -931,8 +1090,9 @@ public class NexaDataGridView : DataGridView
             Invalidate();
         };
 
-        layout.Controls.Add(_searchBox, 0, 0);
-        layout.Controls.Add(clearBtn, 1, 0);
+        layout.Controls.Add(searchIcon, 0, 0);
+        layout.Controls.Add(_searchBox, 1, 0);
+        layout.Controls.Add(clearBtn, 2, 0);
         _searchPanel.Controls.Add(layout);
 
         Parent?.Controls.Add(_searchPanel);
@@ -950,6 +1110,7 @@ public class NexaDataGridView : DataGridView
 
         if (_searchBox != null)
         {
+            _searchBox.BorderStyle = BorderStyle.FixedSingle;
             _searchBox.BackColor = (Color)palette[NexaColorRole.InputBackground].Value;
             _searchBox.ForeColor = (Color)palette[NexaColorRole.TextPrimary].Value;
         }
@@ -982,6 +1143,51 @@ public class NexaDataGridView : DataGridView
         }
     }
 
+    private void PaintCommandButtons(Graphics g)
+    {
+        if (!_showCommandColumn || Columns["NexaCommandColumn"] is not DataGridViewColumn cmdCol) return;
+
+        var palette = ThemeManager.Current.Palette;
+        var dpi = GetCurrentDpi();
+        var editBg = (Color)palette[NexaColorRole.Primary].Value;
+        var deleteBg = Color.FromArgb(220, 80, 80);
+        var textColor = (Color)palette[NexaColorRole.TextOnAccent].Value;
+
+        foreach (DataGridViewRow row in Rows)
+        {
+            if (row.IsNewRow || !row.Visible) continue;
+
+            var cellRect = GetCellDisplayRectangle(cmdCol.Index, row.Index, true);
+            if (cellRect.IsEmpty) continue;
+
+            var padding = NexaDpi.Scale(4, dpi);
+            var buttonHeight = cellRect.Height - padding * 2;
+            var buttonWidth = (cellRect.Width - padding * 3) / 2;
+
+            var editRect = new Rectangle(cellRect.Left + padding, cellRect.Top + padding, buttonWidth, buttonHeight);
+            var deleteRect = new Rectangle(editRect.Right + padding, cellRect.Top + padding, buttonWidth, buttonHeight);
+
+            using var editBrush = new SolidBrush(editBg);
+            using var editPen = new Pen(editBg);
+            using var deleteBrush = new SolidBrush(deleteBg);
+            using var deletePen = new Pen(deleteBg);
+            using var textBrush = new SolidBrush(textColor);
+
+            var radius = NexaDpi.Scale(4, dpi);
+            using var editPath = CreateRoundedRect(editRect, radius);
+            g.FillPath(editBrush, editPath);
+            g.DrawPath(editPen, editPath);
+
+            using var deletePath = CreateRoundedRect(deleteRect, radius);
+            g.FillPath(deleteBrush, deletePath);
+            g.DrawPath(deletePen, deletePath);
+
+            var font = ThemeManager.Current.Typography.ToFont(NexaTypographyRole.Caption, dpi);
+            TextRenderer.DrawText(g, "Edit", font, editRect, textColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine);
+            TextRenderer.DrawText(g, "Delete", font, deleteRect, textColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine);
+        }
+    }
+
     #endregion
 
     #region Summary Footer
@@ -994,8 +1200,14 @@ public class NexaDataGridView : DataGridView
         {
             Dock = DockStyle.Bottom,
             Height = NexaDpi.Scale(32, GetCurrentDpi()),
-            Padding = new Padding(8, 4, 8, 4),
+            Padding = new Padding(NexaDpi.Scale(12, GetCurrentDpi()), NexaDpi.Scale(6, GetCurrentDpi()), NexaDpi.Scale(12, GetCurrentDpi()), NexaDpi.Scale(6, GetCurrentDpi())),
             Margin = new Padding(0)
+        };
+        _summaryPanel.Paint += (s, e) =>
+        {
+            var palette = ThemeManager.Current.Palette;
+            using var pen = new Pen((Color)palette[NexaColorRole.Border].Value, 1);
+            e.Graphics.DrawLine(pen, 0, 0, _summaryPanel.Width, 0);
         };
 
         _summaryItems = new DataGridViewSummaryItemCollection(this);
@@ -1005,6 +1217,48 @@ public class NexaDataGridView : DataGridView
         if (_summaryPanel.Parent != null)
             _summaryPanel.BringToFront();
         _summaryPanel.Visible = _showSummaryFooter;
+    }
+
+    private void EnsureStatusPanel()
+    {
+        if (_statusPanel != null) return;
+
+        _statusPanel = new Panel
+        {
+            Dock = DockStyle.Bottom,
+            Height = NexaDpi.Scale(28, GetCurrentDpi()),
+            Margin = new Padding(0),
+            Padding = new Padding(NexaDpi.Scale(12, GetCurrentDpi()), NexaDpi.Scale(4, GetCurrentDpi()), NexaDpi.Scale(12, GetCurrentDpi()), NexaDpi.Scale(4, GetCurrentDpi()))
+        };
+        _statusPanel.Paint += (s, e) =>
+        {
+            var palette = ThemeManager.Current.Palette;
+            using var pen = new Pen((Color)palette[NexaColorRole.Border].Value, 1);
+            e.Graphics.DrawLine(pen, 0, 0, _statusPanel.Width, 0);
+        };
+
+        var layout = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = false,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            Margin = new Padding(0),
+            Padding = new Padding(0)
+        };
+
+        var countLabel = new Label { Tag = "count", Text = "0 records", AutoSize = true, Margin = new Padding(0) };
+        var stateLabel = new Label { Tag = "state", Text = "Ready", AutoSize = true, Margin = new Padding(0) };
+        layout.Controls.Add(countLabel);
+        layout.Controls.Add(stateLabel);
+
+        _statusPanel.Controls.Add(layout);
+
+        Parent?.Controls.Add(_statusPanel);
+        if (_statusPanel.Parent != null)
+            _statusPanel.BringToFront();
+        _statusPanel.Visible = true;
     }
 
     private void RefreshSummary()
@@ -1062,12 +1316,35 @@ public class NexaDataGridView : DataGridView
         if (_summaryPanel == null || IsDisposed || Disposing) return;
         var palette = ThemeManager.Current.Palette;
         _summaryPanel.BackColor = (Color)palette[NexaColorRole.Surface].Value;
+        _summaryPanel.Padding = new Padding(NexaDpi.Scale(12, GetCurrentDpi()), NexaDpi.Scale(6, GetCurrentDpi()), NexaDpi.Scale(12, GetCurrentDpi()), NexaDpi.Scale(6, GetCurrentDpi()));
 
         foreach (Control ctrl in _summaryPanel.Controls)
         {
             if (ctrl is TableLayoutPanel layout)
             {
                 foreach (Control child in layout.Controls)
+                {
+                    if (child is Label lbl)
+                    {
+                        lbl.ForeColor = (Color)palette[NexaColorRole.TextSecondary].Value;
+                        lbl.Font = ThemeManager.Current.Typography.ToFont(NexaTypographyRole.Caption, GetCurrentDpi());
+                    }
+                }
+            }
+        }
+    }
+
+    private void ApplyStatusTheme()
+    {
+        if (_statusPanel == null || IsDisposed || Disposing) return;
+        var palette = ThemeManager.Current.Palette;
+        _statusPanel.BackColor = (Color)palette[NexaColorRole.Surface].Value;
+
+        foreach (Control ctrl in _statusPanel.Controls)
+        {
+            if (ctrl is FlowLayoutPanel flow)
+            {
+                foreach (Control child in flow.Controls)
                 {
                     if (child is Label lbl)
                     {
@@ -1115,6 +1392,24 @@ public class NexaDataGridView : DataGridView
             unpinItem.Click += (_, __) => UnpinCurrentColumn();
             _contextMenu.Items.Add(unpinItem);
         }
+
+        _contextMenu.Items.Add(new ToolStripSeparator());
+
+        var newItem = new ToolStripMenuItem("New Record");
+        newItem.Click += (_, __) => AddNewRecord();
+        _contextMenu.Items.Add(newItem);
+
+        var editItem = new ToolStripMenuItem("Edit Record");
+        editItem.Click += (_, __) => EditCurrentRecord();
+        _contextMenu.Items.Add(editItem);
+
+        var deleteItem = new ToolStripMenuItem("Delete Record");
+        deleteItem.Click += (_, __) => DeleteSelectedRecords();
+        _contextMenu.Items.Add(deleteItem);
+
+        var saveItem = new ToolStripMenuItem("Save Changes");
+        saveItem.Click += (_, __) => CommitEdit();
+        _contextMenu.Items.Add(saveItem);
 
         _contextMenu.Items.Add(new ToolStripSeparator());
 
@@ -1178,6 +1473,90 @@ public class NexaDataGridView : DataGridView
     }
 
     #endregion
+
+    #region CRUD Operations
+
+    private void AddNewRecord()
+    {
+        if (ReadOnly) return;
+        if (DataSource is IBindingList bindingList)
+        {
+            bindingList.AddNew();
+        }
+        else
+        {
+            var newRow = Rows[Rows.Add()];
+            CurrentCell = newRow.Cells[0];
+            BeginEdit(true);
+        }
+        UpdateStatusPanel();
+    }
+
+    private void EditCurrentRecord()
+    {
+        if (ReadOnly) return;
+        if (CurrentCell != null && CurrentCell.RowIndex >= 0)
+        {
+            CurrentCell = CurrentCell;
+            BeginEdit(true);
+        }
+    }
+
+    private void DeleteSelectedRecords()
+    {
+        if (ReadOnly) return;
+        if (SelectedRows.Count == 0) return;
+
+        foreach (DataGridViewRow row in SelectedRows)
+        {
+            if (!row.IsNewRow)
+            {
+                Rows.RemoveAt(row.Index);
+            }
+        }
+        UpdateStatusPanel();
+    }
+
+    private void CommitEdit()
+    {
+        if (IsCurrentCellDirty)
+        {
+            EndEdit();
+        }
+        if (BindingContext?[DataSource] is CurrencyManager cm)
+        {
+            cm.EndCurrentEdit();
+        }
+        UpdateStatusPanel();
+    }
+
+    private void UpdateStatusPanel()
+    {
+        if (_statusPanel == null || IsDisposed || Disposing) return;
+
+        foreach (Control ctrl in _statusPanel.Controls)
+        {
+            if (ctrl is FlowLayoutPanel flow)
+            {
+                foreach (Control child in flow.Controls)
+                {
+                    if (child is Label lbl && lbl.Tag is string tag)
+                    {
+                        if (tag == "count")
+                        {
+                            var visibleCount = Rows.Cast<DataGridViewRow>().Count(r => !r.IsNewRow && r.Visible);
+                            lbl.Text = $"{visibleCount} records";
+                        }
+                        else if (tag == "state")
+                        {
+                            var hasDirty = IsCurrentCellDirty || (DataSource != null && BindingContext?[DataSource] is CurrencyManager cm && cm.IsBindingSuspended);
+                            lbl.Text = hasDirty ? "Modified" : "Ready";
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     #endregion
 
@@ -1354,11 +1733,15 @@ public class NexaDataGridView : DataGridView
     }
 
     #endregion
+
+
+    #endregion
 }
 
-/// <summary>
-/// Aggregate functions for summary items.
-/// </summary>
+
+    /// <summary>
+    /// Represents a summary item for a column in the footer.
+    /// </summary>
 public enum DataGridViewSummaryAggregate
 {
     /// <summary>Count of rows.</summary>

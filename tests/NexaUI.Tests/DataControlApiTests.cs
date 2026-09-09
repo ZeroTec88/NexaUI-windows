@@ -345,6 +345,39 @@ public sealed class DataControlApiTests
         tree.Dispose();
     }
 
+    [TestMethod]
+    public void NexaDataGridView_CommandColumn_And_CRUD_Defaults()
+    {
+        var grid = new NexaDataGridView();
+        Assert.IsFalse(grid.ShowCommandColumn);
+        Assert.IsTrue(grid.EnableInlineEditing);
+        grid.Dispose();
+    }
+
+    [TestMethod]
+    public void NexaDataGridView_CommandColumn_Toggle()
+    {
+        var grid = new NexaDataGridView();
+        grid.ShowCommandColumn = true;
+        Assert.IsTrue(grid.ShowCommandColumn);
+        Assert.IsTrue(grid.Columns.Contains("NexaCommandColumn"));
+        grid.ShowCommandColumn = false;
+        Assert.IsFalse(grid.ShowCommandColumn);
+        Assert.IsFalse(grid.Columns.Contains("NexaCommandColumn"));
+        grid.Dispose();
+    }
+
+    [TestMethod]
+    public void NexaDataGridView_InlineEditing_Toggle()
+    {
+        var grid = new NexaDataGridView();
+        grid.EnableInlineEditing = false;
+        Assert.IsTrue(grid.ReadOnly);
+        grid.EnableInlineEditing = true;
+        Assert.IsFalse(grid.ReadOnly);
+        grid.Dispose();
+    }
+
     // -------- Cross-control / regression --------
 
     [TestMethod]

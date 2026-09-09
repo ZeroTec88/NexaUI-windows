@@ -7,6 +7,10 @@ API design, visual identity, and theme system. The goal is to provide a
 productive, professional set of WinForms components that developers can
 consume from both **C#** and **VB.NET**.
 
+## Documentation
+
+- [📖 Full Documentation Site](docs/index.html) — Overview, getting started, control API reference, and theme system guide.
+
 ## Target Framework
 
 - `net10.0-windows`

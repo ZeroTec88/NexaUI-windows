@@ -431,8 +431,9 @@ public sealed class GalleryDataPresentationScreen : UserControl
         var advancedGrid = new NexaDataGridView
         {
             Dock = DockStyle.Top,
-            Height = 300,
-            ReadOnly = true,
+            Height = 320,
+            ReadOnly = false,
+            EnableInlineEditing = true,
             ShowRowNumbers = false,
             AlternateRowColors = true,
             HeaderHeight = 36,
@@ -442,12 +443,13 @@ public sealed class GalleryDataPresentationScreen : UserControl
             RowCornerRadius = 0,
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-            MultiSelect = false,
-            AllowUserToAddRows = false,
-            AllowUserToDeleteRows = false,
+            MultiSelect = true,
+            AllowUserToAddRows = true,
+            AllowUserToDeleteRows = true,
             ShowFilterRow = true,
             ShowSearchPanel = true,
-            ShowSummaryFooter = true
+            ShowSummaryFooter = true,
+            ShowCommandColumn = true
         };
 
         advancedGrid.Columns.Add("Id", "Student ID");

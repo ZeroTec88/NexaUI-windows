@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started — NexaUI Documentation</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #60a5fa;
+            --border: #475569;
+            --success: #22c55e;
+            --code-bg: #0d1117;
+            --sidebar-width: 280px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .nav-section { margin-bottom: 1.5rem; }
+
+        .nav-section-title {
+            padding: 0 1.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.15s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-primary);
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: var(--accent);
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: calc(100vw - var(--sidebar-width));
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #e2e8f0;
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent);
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: var(--success);
+        }
+
+        .step {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            padding: 1.25rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .step-content h4 {
+            margin: 0 0 0.5rem;
+        }
+
+        .step-content p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>⚡ NexaUI</h1>
+            <p>v1.0 — .NET 10 WinForms</p>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Getting Started</div>
+            <a href="index.html" class="nav-item">Overview</a>
+            <a href="getting-started.html" class="nav-item active">Installation</a>
+            <a href="themes.html" class="nav-item">Themes</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Data Controls</div>
+            <a href="controls/datagrid.html" class="nav-item">NexaDataGridView</a>
+            <a href="controls/listview.html" class="nav-item">NexaListView</a>
+            <a href="controls/propertygrid.html" class="nav-item">NexaPropertyGrid</a>
+            <a href="controls/treeview.html" class="nav-item">NexaTreeView</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <h2>Getting Started</h2>
+        <p>Learn how to install NexaUI, configure themes, and build your first modern WinForms application.</p>
+
+        <div class="alert alert-info">
+            <strong>Prerequisites:</strong> .NET 10 SDK or later, Windows 10/11, Visual Studio 2022 or later (recommended).
+        </div>
+
+        <h3>Installation</h3>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h4>Install the NuGet Package</h4>
+                <p>Add NexaUI to your WinForms project using the NuGet Package Manager.</p>
+                <pre><code>Install-Package NexaUI</code></pre>
+                <p>Or use the .NET CLI:</p>
+                <pre><code>dotnet add package NexaUI</code></pre>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h4>Update Your Project File</h4>
+                <p>Ensure your project targets Windows and enables WinForms:</p>
+                <pre><code>&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
+  &lt;PropertyGroup&gt;
+    &lt;TargetFramework&gt;net10.0-windows&lt;/TargetFramework&gt;
+    &lt;UseWindowsForms&gt;true&lt;/UseWindowsForms&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;</code></pre>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h4>Apply a Theme</h4>
+                <p>NexaUI includes a built-in theme system. Apply a theme in your application startup:</p>
+                <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Themes;
+
+// Apply light theme (default)
+ThemeManager.SetTheme(new LightTheme());
+
+// Or apply dark theme
+ThemeManager.SetTheme(new DarkTheme());
+
+// Theme changes apply to all controls automatically
+ThemeManager.ThemeChanged += (s, e) => {
+    Console.WriteLine($"Theme changed to: {e.Current.Name}");
+};</code></pre>
+                <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Themes
+
+' Apply light theme (default)
+ThemeManager.SetTheme(New LightTheme())
+
+' Or apply dark theme
+ThemeManager.SetTheme(New DarkTheme())
+
+' Theme changes apply to all controls automatically
+AddHandler ThemeManager.ThemeChanged, Sub(s, e)
+    Console.WriteLine($"Theme changed to: {e.Current.Name}")
+End Sub</code></pre>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h4>Add Controls to Your Form</h4>
+                <p>Drag controls from the toolbox onto your form, or create them programmatically:</p>
+                <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+
+public partial class MainForm : Form
+{
+    public MainForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildUI();
+    }
+
+    private void BuildUI()
+    {
+        var card = new NexaCard
+        {
+            Title = "Welcome to NexaUI",
+            Subtitle = "Modern WinForms controls",
+            Dock = DockStyle.Fill
+        };
+
+        var button = new NexaButton
+        {
+            Text = "Get Started",
+            Style = NexaButtonStyle.Primary,
+            Dock = DockStyle.Top
+        };
+        button.Click += (s, e) => MessageBox.Show("Hello NexaUI!");
+
+        card.ContentPanel.Controls.Add(button);
+        Controls.Add(card);
+    }
+}</code></pre>
+                <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class MainForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildUI()
+    End Sub
+
+    Private Sub BuildUI()
+        Dim card As New NexaCard With {
+            .Title = "Welcome to NexaUI",
+            .Subtitle = "Modern WinForms controls",
+            .Dock = DockStyle.Fill
+        }
+
+        Dim button As New NexaButton With {
+            .Text = "Get Started",
+            .Style = NexaButtonStyle.Primary,
+            .Dock = DockStyle.Top
+        }
+        AddHandler button.Click, Sub(s, e)
+            MessageBox.Show("Hello NexaUI!")
+        End Sub
+
+        card.ContentPanel.Controls.Add(button)
+        Controls.Add(card)
+    End Sub
+End Class</code></pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Theme Switching at Runtime</h3>
+            <p>Switch themes dynamically without recreating your application:</p>
+            <pre><code><span class="code-header"><span class="code-lang">C#</span></span>// Toggle between light and dark themes
+private void ToggleTheme()
+{
+    var current = ThemeManager.Current;
+    ThemeManager.SetTheme(current is LightTheme ? new DarkTheme() : new LightTheme());
+}</code></pre>
+            <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>' Toggle between light and dark themes
+Private Sub ToggleTheme()
+    Dim current = ThemeManager.Current
+    ThemeManager.SetTheme(If(TypeOf current Is LightTheme, New DarkTheme(), New LightTheme()))
+End Sub</code></pre>
+        </div>
+
+        <div class="section">
+            <h3>High DPI Support</h3>
+            <p>NexaUI controls automatically scale for high-DPI displays. Ensure your application is DPI-aware:</p>
+            <pre><code>&lt;application xmlns="urn:schemas-microsoft-com:asm.v3"&gt;
+  &lt;windowsSettings&gt;
+    &lt;dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings"&gt;true&lt;/dpiAware&gt;
+    &lt;dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings"&gt;PerMonitorV2&lt;/dpiAwareness&gt;
+  &lt;/windowsSettings&gt;
+&lt;/application&gt;</code></pre>
+        </div>
+
+        <div class="section">
+            <h3>Next Steps</h3>
+            <p>Now that you have NexaUI installed, explore the controls:</p>
+            <ul>
+                <li><a href="controls/datagrid.html" style="color: var(--accent);">NexaDataGridView</a> — Advanced data grid with filtering, search, and CRUD</li>
+                <li><a href="controls/listview.html" style="color: var(--accent);">NexaListView</a> — Theme-aware ListView</li>
+                <li><a href="controls/propertygrid.html" style="color: var(--accent);">NexaPropertyGrid</a> — Settings editor</li>
+                <li><a href="controls/treeview.html" style="color: var(--accent);">NexaTreeView</a> — Hierarchical data display</li>
+            </ul>
+        </div>
+    </main>
+</body>
+</html>
