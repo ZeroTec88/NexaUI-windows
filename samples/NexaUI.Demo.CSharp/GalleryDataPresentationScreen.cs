@@ -279,7 +279,7 @@ public sealed class GalleryDataPresentationScreen : UserControl
         {
             Dock = DockStyle.Top,
             Height = 280,
-            ReadOnly = true,
+            ReadOnly = false,
             ShowRowNumbers = true,
             AlternateRowColors = true,
             HeaderHeight = 36,

@@ -245,7 +245,7 @@ Public NotInheritable Class GalleryDataPresentationScreen
         Dim advancedGrid = New NexaDataGridView With {
             .Dock = DockStyle.Top,
             .Height = 280,
-            .ReadOnly = True,
+            .ReadOnly = False,
             .ShowRowNumbers = True,
             .AlternateRowColors = True,
             .HeaderHeight = 36,
