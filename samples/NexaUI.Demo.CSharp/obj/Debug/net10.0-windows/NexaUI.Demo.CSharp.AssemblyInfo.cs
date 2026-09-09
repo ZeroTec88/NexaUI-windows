@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("NexaUI.Core")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("NexaUI.Demo.CSharp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1599bb584e6864c2fe8e05dbddc25eefcee7aa7d")]
-[assembly: System.Reflection.AssemblyProductAttribute("NexaUI.Core")]
-[assembly: System.Reflection.AssemblyTitleAttribute("NexaUI.Core")]
+[assembly: System.Reflection.AssemblyProductAttribute("NexaUI.Demo.CSharp")]
+[assembly: System.Reflection.AssemblyTitleAttribute("NexaUI.Demo.CSharp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
 [assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]

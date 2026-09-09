@@ -1,0 +1,92 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "NexaUI.Demo.CSharp/1.0.0": {
+        "dependencies": {
+          "NexaUI.Controls": "1.0.0",
+          "NexaUI.Core": "1.0.0",
+          "NexaUI.Icons": "1.0.0",
+          "NexaUI.Themes": "1.0.0"
+        },
+        "runtime": {
+          "NexaUI.Demo.CSharp.dll": {}
+        }
+      },
+      "NexaUI.Controls/1.0.0": {
+        "dependencies": {
+          "NexaUI.Core": "1.0.0",
+          "NexaUI.Icons": "1.0.0",
+          "NexaUI.Themes": "1.0.0"
+        },
+        "runtime": {
+          "NexaUI.Controls.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "NexaUI.Core/1.0.0": {
+        "runtime": {
+          "NexaUI.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "NexaUI.Icons/1.0.0": {
+        "dependencies": {
+          "NexaUI.Core": "1.0.0"
+        },
+        "runtime": {
+          "NexaUI.Icons.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "NexaUI.Themes/1.0.0": {
+        "dependencies": {
+          "NexaUI.Core": "1.0.0"
+        },
+        "runtime": {
+          "NexaUI.Themes.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "NexaUI.Demo.CSharp/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NexaUI.Controls/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NexaUI.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NexaUI.Icons/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NexaUI.Themes/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
