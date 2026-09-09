@@ -35,15 +35,6 @@ public class NexaDataGridView : DataGridView
     /// </summary>
     public NexaDataGridView()
     {
-        SetStyle(
-            ControlStyles.UserPaint |
-            ControlStyles.AllPaintingInWmPaint |
-            ControlStyles.OptimizedDoubleBuffer |
-            ControlStyles.ResizeRedraw |
-            ControlStyles.Selectable,
-            true);
-
-        DoubleBuffered = true;
         EnableHeadersVisualStyles = false;
 
         ThemeManager.ThemeChanged += OnThemeChanged;
@@ -107,6 +98,15 @@ public class NexaDataGridView : DataGridView
             {
                 RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing;
                 RefreshRowNumbers();
+            }
+            else
+            {
+                foreach (DataGridViewRow row in Rows)
+                {
+                    if (!row.IsNewRow)
+                        row.HeaderCell.Value = null;
+                }
+                RowHeadersWidth = 0;
             }
             Invalidate();
         }
@@ -368,13 +368,13 @@ public class NexaDataGridView : DataGridView
 
     private void RefreshRowNumbers()
     {
-        if (!_showRowNumbers || IsDisposed || Disposing) return;
+        if (!_showRowNumbers || IsDisposed || Disposing || !IsHandleCreated) return;
 
         var dpi = GetCurrentDpi();
-        var width = TextRenderer.MeasureText(Rows.Count.ToString(), RowHeadersDefaultCellStyle.Font).Width +
+        var maxText = Rows.Count.ToString();
+        var width = TextRenderer.MeasureText(maxText, RowHeadersDefaultCellStyle.Font).Width +
                     NexaDpi.Scale(16, dpi);
-        if (RowHeadersWidth < width)
-            RowHeadersWidth = width;
+        RowHeadersWidth = width;
 
         foreach (DataGridViewRow row in Rows)
         {
@@ -382,89 +382,6 @@ public class NexaDataGridView : DataGridView
             {
                 row.HeaderCell.Value = (row.Index + 1).ToString();
             }
-        }
-    }
-
-    protected override void OnCellPainting(DataGridViewCellPaintingEventArgs e)
-    {
-        if (e.RowIndex < 0 || e.ColumnIndex < 0 || e.PaintParts == DataGridViewPaintParts.None)
-        {
-            base.OnCellPainting(e);
-            return;
-        }
-
-        var theme = ThemeManager.Current;
-        var palette = theme.Palette;
-        var dpi = GetCurrentDpi();
-
-        var isSelected = (e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected;
-        var isCurrent = (e.State & DataGridViewElementStates.Displayed) == DataGridViewElementStates.Displayed &&
-                        CurrentCellAddress == new Point(e.ColumnIndex, e.RowIndex);
-        var isAlternate = _alternateRowColors && (e.RowIndex % 2 == 1);
-
-        var bounds = e.CellBounds;
-        var radius = NexaDpi.Scale(_rowCornerRadius, dpi);
-
-        if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && (isSelected || _rowCornerRadius > 0))
-        {
-            e.PaintBackground(e.CellBounds, true);
-            e.PaintContent(e.CellBounds);
-
-            using var g = e.Graphics;
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-
-            Color bg;
-            if (isSelected)
-            {
-                bg = (Color)palette[NexaColorRole.Primary].Value;
-            }
-            else if (isAlternate)
-            {
-                bg = (Color)palette[NexaColorRole.SurfaceVariant].Value;
-            }
-            else
-            {
-                bg = (Color)palette[NexaColorRole.Surface].Value;
-            }
-
-            if (radius > 0 && bounds.Width > 0 && bounds.Height > 0)
-            {
-                var rect = new Rectangle(bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1);
-                using var path = CreateRoundedRect(rect, radius);
-                using var brush = new SolidBrush(bg);
-                g.FillPath(brush, path);
-            }
-            else
-            {
-                using var brush = new SolidBrush(bg);
-                g.FillRectangle(brush, bounds);
-            }
-
-            if (_showHorizontalGridLines && e.RowIndex < RowCount - 1)
-            {
-                using var pen = new Pen((Color)palette[NexaColorRole.Border].Value, 1);
-                g.DrawLine(pen, bounds.Left, bounds.Bottom - 1, bounds.Right, bounds.Bottom - 1);
-            }
-
-            if (_showVerticalGridLines && e.ColumnIndex < ColumnCount - 1)
-            {
-                using var pen = new Pen((Color)palette[NexaColorRole.Border].Value, 1);
-                g.DrawLine(pen, bounds.Right - 1, bounds.Top, bounds.Right - 1, bounds.Bottom);
-            }
-
-            if (isCurrent && Focused && TabStop)
-            {
-                using var focusPen = new Pen((Color)palette[NexaColorRole.Focus].Value, NexaDpi.Scale(theme.Metrics.FocusRingThicknessInDips, dpi));
-                var focusRect = Rectangle.Inflate(bounds, -NexaDpi.Scale(2, dpi), -NexaDpi.Scale(2, dpi));
-                using var focusPath = CreateRoundedRect(focusRect, Math.Max(0, radius - NexaDpi.Scale(2, dpi)));
-                g.DrawPath(focusPen, focusPath);
-            }
-
-            e.Handled = true;
-        }
-        else
-        {
-            base.OnCellPainting(e);
         }
     }
 
