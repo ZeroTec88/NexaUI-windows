@@ -132,7 +132,7 @@ public class NexaDataGridView : DataGridView
                     if (!row.IsNewRow)
                         row.HeaderCell.Value = null;
                 }
-                RowHeadersWidth = 0;
+                RowHeadersWidth = 4;
             }
             Invalidate();
         }
@@ -421,6 +421,36 @@ public class NexaDataGridView : DataGridView
 
         chooser.Controls.Add(list);
         chooser.ShowDialog(this);
+    }
+
+    /// <summary>
+    /// Auto-generates columns from the public properties of a data type and binds the provided data.
+    /// </summary>
+    /// <typeparam name="T">The data model type.</typeparam>
+    /// <param name="data">The collection of data to display.</param>
+    /// <param name="columnHeaderPrefix">Optional prefix for auto-generated column header text.</param>
+    public void AutoGenerateColumnsFromType<T>(IEnumerable<T> data, string? columnHeaderPrefix = null)
+    {
+        if (data == null) return;
+
+        Columns.Clear();
+        AutoGenerateColumns = false;
+
+        var bindingList = new BindingList<T>(data.ToList());
+        DataSource = bindingList;
+
+        var props = typeof(T).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        foreach (var prop in props)
+        {
+            var col = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = prop.Name,
+                HeaderText = string.IsNullOrWhiteSpace(columnHeaderPrefix) ? prop.Name : $"{columnHeaderPrefix} {prop.Name}",
+                Name = prop.Name,
+                SortMode = DataGridViewColumnSortMode.Automatic
+            };
+            Columns.Add(col);
+        }
     }
 
     #endregion
@@ -1228,14 +1258,37 @@ public class NexaDataGridView : DataGridView
             }
             else
             {
-                result = _aggregate switch
+                var numericValues = new List<decimal>();
+                foreach (var v in values)
                 {
-                    DataGridViewSummaryAggregate.Sum => values.Sum(v => Convert.ToDecimal(v)),
-                    DataGridViewSummaryAggregate.Avg => values.Average(v => Convert.ToDecimal(v)),
-                    DataGridViewSummaryAggregate.Min => values.Min(v => Convert.ToDecimal(v)),
-                    DataGridViewSummaryAggregate.Max => values.Max(v => Convert.ToDecimal(v)),
-                    _ => values.Count
-                };
+                    if (v == null) continue;
+                    var s = v.ToString();
+                    if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out var d))
+                        numericValues.Add(d);
+                }
+
+                if (numericValues.Count == 0)
+                {
+                    result = _aggregate switch
+                    {
+                        DataGridViewSummaryAggregate.Sum => 0m,
+                        DataGridViewSummaryAggregate.Avg => 0m,
+                        DataGridViewSummaryAggregate.Min => 0m,
+                        DataGridViewSummaryAggregate.Max => 0m,
+                        _ => 0
+                    };
+                }
+                else
+                {
+                    result = _aggregate switch
+                    {
+                        DataGridViewSummaryAggregate.Sum => numericValues.Sum(),
+                        DataGridViewSummaryAggregate.Avg => numericValues.Average(),
+                        DataGridViewSummaryAggregate.Min => numericValues.Min(),
+                        DataGridViewSummaryAggregate.Max => numericValues.Max(),
+                        _ => numericValues.Count
+                    };
+                }
             }
 
             try

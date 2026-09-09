@@ -41,6 +41,12 @@ public sealed class GalleryDataPresentationScreen : UserControl
         _root.Controls.Add(SectionTitle("NexaDataGridView — student management"));
         _root.Controls.Add(BuildDataGridCard());
 
+        _root.Controls.Add(SectionTitle("Auto-Generated Columns from API Data"));
+        _root.Controls.Add(BuildAutoGridCard());
+
+        _root.Controls.Add(SectionTitle("Manual Column Configuration"));
+        _root.Controls.Add(BuildManualGridCard());
+
         _root.Controls.Add(SectionTitle("NexaListView — details view"));
         _root.Controls.Add(BuildListViewCard());
 
@@ -212,6 +218,117 @@ public sealed class GalleryDataPresentationScreen : UserControl
         return card;
     }
 
+    private Control BuildAutoGridCard()
+    {
+        var card = CreateDemoCard();
+        card.Controls.Add(DescriptionLabel("Columns are auto-generated from the API DTO using reflection. Ideal for dynamic data sources."));
+
+        var apiGrid = new NexaDataGridView
+        {
+            Dock = DockStyle.Top,
+            Height = 320,
+            ReadOnly = true,
+            AlternateRowColors = true,
+            HeaderHeight = 36,
+            RowHeight = 32,
+            GridStyle = NexaGridStyle.Default,
+            HeaderStyle = NexaHeaderStyle.Standard,
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+            MultiSelect = false
+        };
+
+        var apiData = GenerateApiCourses();
+        apiGrid.AutoGenerateColumnsFromType(apiData, "Course");
+
+        card.Controls.Add(apiGrid);
+        return card;
+    }
+
+    private Control BuildManualGridCard()
+    {
+        var card = CreateDemoCard();
+        card.Controls.Add(DescriptionLabel("Columns are defined manually with custom widths, formats, and behavior — full control like DevExpress."));
+
+        var manualGrid = new NexaDataGridView
+        {
+            Dock = DockStyle.Top,
+            Height = 320,
+            ReadOnly = true,
+            AlternateRowColors = true,
+            HeaderHeight = 36,
+            RowHeight = 32,
+            GridStyle = NexaGridStyle.Default,
+            HeaderStyle = NexaHeaderStyle.Standard,
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
+            SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+            MultiSelect = false
+        };
+
+        var colId = new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "ID", Width = 80, ReadOnly = true };
+        var colName = new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "Employee Name", Width = 180 };
+        var colDept = new DataGridViewComboBoxColumn { DataPropertyName = "Department", HeaderText = "Department", Width = 140 };
+        colDept.Items.AddRange("ICT", "English", "Business", "HR", "Finance");
+        var colSalary = new DataGridViewTextBoxColumn { DataPropertyName = "Salary", HeaderText = "Salary", Width = 100, DefaultCellStyle = { Format = "C2" } };
+        var colActive = new DataGridViewCheckBoxColumn { DataPropertyName = "IsActive", HeaderText = "Active", Width = 70 };
+        var colDate = new DataGridViewTextBoxColumn { DataPropertyName = "Joined", HeaderText = "Joined", Width = 120, DefaultCellStyle = { Format = "yyyy-MM-dd" } };
+
+        manualGrid.Columns.AddRange(colId, colName, colDept, colSalary, colActive, colDate);
+
+        var employees = GenerateEmployees();
+        manualGrid.DataSource = new BindingList<Employee>(employees);
+
+        card.Controls.Add(manualGrid);
+        return card;
+    }
+
+    private static List<CourseDto> GenerateApiCourses()
+    {
+        return new List<CourseDto>
+        {
+            new CourseDto { Code = "ICT-101", Title = "Introduction to Computing", Credits = 3, Level = "Beginner", Instructor = "Dr. Perera", Capacity = 40, Enrolled = 38 },
+            new CourseDto { Code = "ICT-201", Title = "Data Structures", Credits = 4, Level = "Intermediate", Instructor = "Prof. Silva", Capacity = 35, Enrolled = 35 },
+            new CourseDto { Code = "ENG-101", Title = "English for Academic Purposes", Credits = 2, Level = "Beginner", Instructor = "Ms. Fernando", Capacity = 50, Enrolled = 45 },
+            new CourseDto { Code = "BUS-301", Title = "Business Strategy", Credits = 3, Level = "Advanced", Instructor = "Dr. Kumara", Capacity = 30, Enrolled = 28 },
+            new CourseDto { Code = "ICT-301", Title = "Machine Learning Basics", Credits = 4, Level = "Advanced", Instructor = "Dr. Dias", Capacity = 25, Enrolled = 25 },
+            new CourseDto { Code = "ENG-201", Title = "Business English", Credits = 2, Level = "Intermediate", Instructor = "Ms. Liyanage", Capacity = 40, Enrolled = 30 }
+        };
+    }
+
+    private sealed class CourseDto
+    {
+        public string Code { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public int Credits { get; set; }
+        public string Level { get; set; } = string.Empty;
+        public string Instructor { get; set; } = string.Empty;
+        public int Capacity { get; set; }
+        public int Enrolled { get; set; }
+    }
+
+    private static List<Employee> GenerateEmployees()
+    {
+        return new List<Employee>
+        {
+            new Employee { Id = "EMP-001", Name = "Kasun Perera", Department = "ICT", Salary = 120_000m, IsActive = true, Joined = new DateTime(2021, 5, 10) },
+            new Employee { Id = "EMP-002", Name = "Nimal Silva", Department = "English", Salary = 95_000m, IsActive = true, Joined = new DateTime(2022, 2, 15) },
+            new Employee { Id = "EMP-003", Name = "Amal Fernando", Department = "Business", Salary = 110_000m, IsActive = true, Joined = new DateTime(2020, 9, 1) },
+            new Employee { Id = "EMP-004", Name = "Saman Kumara", Department = "ICT", Salary = 130_000m, IsActive = false, Joined = new DateTime(2019, 3, 22) },
+            new Employee { Id = "EMP-005", Name = "Malini Fernando", Department = "HR", Salary = 85_000m, IsActive = true, Joined = new DateTime(2023, 1, 8) },
+            new Employee { Id = "EMP-006", Name = "Dilshani Perera", Department = "Finance", Salary = 105_000m, IsActive = true, Joined = new DateTime(2021, 11, 30) }
+        };
+    }
+
+    private sealed class Employee
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Department { get; set; } = string.Empty;
+        public decimal Salary { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime Joined { get; set; }
+    }
+
     private Control BuildListViewCard()
     {
         var card = CreateDemoCard();
@@ -338,14 +455,22 @@ public sealed class GalleryDataPresentationScreen : UserControl
         advancedGrid.Columns.Add("Course", "Course");
         advancedGrid.Columns.Add("Batch", "Batch");
         advancedGrid.Columns.Add("Status", "Status");
-        advancedGrid.Columns.Add("Attendance", "Attendance");
+        var attendanceCol = new DataGridViewTextBoxColumn
+        {
+            DataPropertyName = "Attendance",
+            HeaderText = "Attendance",
+            Name = "Attendance"
+        };
+        attendanceCol.DefaultCellStyle.Format = "P0";
+        advancedGrid.Columns.Add(attendanceCol);
 
-        advancedGrid.SummaryItems.Add("Attendance", DataGridViewSummaryAggregate.Avg, "Avg: {0}%");
+        advancedGrid.SummaryItems.Add("Attendance", DataGridViewSummaryAggregate.Avg, "Avg: {0:P0}");
 
         var students = GenerateStudents();
         foreach (var s in students)
         {
-            advancedGrid.Rows.Add(s.Id, s.Name, s.Course, s.Batch, s.Status, s.Attendance);
+            var attendanceValue = int.TryParse(s.Attendance.TrimEnd('%'), out var pct) ? pct / 100m : 0m;
+            advancedGrid.Rows.Add(s.Id, s.Name, s.Course, s.Batch, s.Status, attendanceValue);
         }
 
         var topBar = new TableLayoutPanel

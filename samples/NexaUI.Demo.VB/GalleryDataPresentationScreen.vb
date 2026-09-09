@@ -38,6 +38,12 @@ Public NotInheritable Class GalleryDataPresentationScreen
         _root.Controls.Add(SectionTitle("NexaDataGridView — student management"))
         _root.Controls.Add(BuildDataGridCard())
 
+        _root.Controls.Add(SectionTitle("Auto-Generated Columns from API Data"))
+        _root.Controls.Add(BuildAutoGridCard())
+
+        _root.Controls.Add(SectionTitle("Manual Column Configuration"))
+        _root.Controls.Add(BuildManualGridCard())
+
         _root.Controls.Add(SectionTitle("NexaListView — details view"))
         _root.Controls.Add(BuildListViewCard())
 
@@ -183,6 +189,109 @@ Public NotInheritable Class GalleryDataPresentationScreen
         Return card
     End Function
 
+    Private Function BuildAutoGridCard() As Control
+        Dim card = CreateDemoCard()
+        card.Controls.Add(DescriptionLabel("Columns are auto-generated from the API DTO using reflection. Ideal for dynamic data sources."))
+
+        Dim apiGrid = New NexaDataGridView With {
+            .Dock = DockStyle.Top,
+            .Height = 320,
+            .ReadOnly = True,
+            .AlternateRowColors = True,
+            .HeaderHeight = 36,
+            .RowHeight = 32,
+            .GridStyle = NexaGridStyle.Default,
+            .HeaderStyle = NexaHeaderStyle.Standard,
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+            .MultiSelect = False
+        }
+
+        Dim apiData = GenerateApiCourses()
+        apiGrid.AutoGenerateColumnsFromType(apiData, "Course")
+
+        card.Controls.Add(apiGrid)
+        Return card
+    End Function
+
+    Private Function BuildManualGridCard() As Control
+        Dim card = CreateDemoCard()
+        card.Controls.Add(DescriptionLabel("Columns are defined manually with custom widths, formats, and behavior — full control like DevExpress."))
+
+        Dim manualGrid = New NexaDataGridView With {
+            .Dock = DockStyle.Top,
+            .Height = 320,
+            .ReadOnly = True,
+            .AlternateRowColors = True,
+            .HeaderHeight = 36,
+            .RowHeight = 32,
+            .GridStyle = NexaGridStyle.Default,
+            .HeaderStyle = NexaHeaderStyle.Standard,
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+            .MultiSelect = False
+        }
+
+        Dim colId = New DataGridViewTextBoxColumn With {.DataPropertyName = "Id", .HeaderText = "ID", .Width = 80, .ReadOnly = True}
+        Dim colName = New DataGridViewTextBoxColumn With {.DataPropertyName = "Name", .HeaderText = "Employee Name", .Width = 180}
+        Dim colDept = New DataGridViewComboBoxColumn With {.DataPropertyName = "Department", .HeaderText = "Department", .Width = 140}
+        colDept.Items.AddRange("ICT", "English", "Business", "HR", "Finance")
+        Dim colSalary = New DataGridViewTextBoxColumn With {.DataPropertyName = "Salary", .HeaderText = "Salary", .Width = 100}
+        colSalary.DefaultCellStyle.Format = "C2"
+        Dim colActive = New DataGridViewCheckBoxColumn With {.DataPropertyName = "IsActive", .HeaderText = "Active", .Width = 70}
+        Dim colDate = New DataGridViewTextBoxColumn With {.DataPropertyName = "Joined", .HeaderText = "Joined", .Width = 120}
+        colDate.DefaultCellStyle.Format = "yyyy-MM-dd"
+
+        manualGrid.Columns.AddRange(colId, colName, colDept, colSalary, colActive, colDate)
+
+        Dim employees = GenerateEmployees()
+        manualGrid.DataSource = New BindingList(Of Employee)(employees)
+
+        card.Controls.Add(manualGrid)
+        Return card
+    End Function
+
+    Private Shared Function GenerateApiCourses() As List(Of CourseDto)
+        Return New List(Of CourseDto) From {
+            New CourseDto With {.Code = "ICT-101", .Title = "Introduction to Computing", .Credits = 3, .Level = "Beginner", .Instructor = "Dr. Perera", .Capacity = 40, .Enrolled = 38},
+            New CourseDto With {.Code = "ICT-201", .Title = "Data Structures", .Credits = 4, .Level = "Intermediate", .Instructor = "Prof. Silva", .Capacity = 35, .Enrolled = 35},
+            New CourseDto With {.Code = "ENG-101", .Title = "English for Academic Purposes", .Credits = 2, .Level = "Beginner", .Instructor = "Ms. Fernando", .Capacity = 50, .Enrolled = 45},
+            New CourseDto With {.Code = "BUS-301", .Title = "Business Strategy", .Credits = 3, .Level = "Advanced", .Instructor = "Dr. Kumara", .Capacity = 30, .Enrolled = 28},
+            New CourseDto With {.Code = "ICT-301", .Title = "Machine Learning Basics", .Credits = 4, .Level = "Advanced", .Instructor = "Dr. Dias", .Capacity = 25, .Enrolled = 25},
+            New CourseDto With {.Code = "ENG-201", .Title = "Business English", .Credits = 2, .Level = "Intermediate", .Instructor = "Ms. Liyanage", .Capacity = 40, .Enrolled = 30}
+        }
+    End Function
+
+    Private Class CourseDto
+        Public Property Code As String = String.Empty
+        Public Property Title As String = String.Empty
+        Public Property Credits As Integer
+        Public Property Level As String = String.Empty
+        Public Property Instructor As String = String.Empty
+        Public Property Capacity As Integer
+        Public Property Enrolled As Integer
+    End Class
+
+    Private Shared Function GenerateEmployees() As List(Of Employee)
+        Return New List(Of Employee) From {
+            New Employee With {.Id = "EMP-001", .Name = "Kasun Perera", .Department = "ICT", .Salary = 120000D, .IsActive = True, .Joined = New DateTime(2021, 5, 10)},
+            New Employee With {.Id = "EMP-002", .Name = "Nimal Silva", .Department = "English", .Salary = 95000D, .IsActive = True, .Joined = New DateTime(2022, 2, 15)},
+            New Employee With {.Id = "EMP-003", .Name = "Amal Fernando", .Department = "Business", .Salary = 110000D, .IsActive = True, .Joined = New DateTime(2020, 9, 1)},
+            New Employee With {.Id = "EMP-004", .Name = "Saman Kumara", .Department = "ICT", .Salary = 130000D, .IsActive = False, .Joined = New DateTime(2019, 3, 22)},
+            New Employee With {.Id = "EMP-005", .Name = "Malini Fernando", .Department = "HR", .Salary = 85000D, .IsActive = True, .Joined = New DateTime(2023, 1, 8)},
+            New Employee With {.Id = "EMP-006", .Name = "Dilshani Perera", .Department = "Finance", .Salary = 105000D, .IsActive = True, .Joined = New DateTime(2021, 11, 30)}
+        }
+    End Function
+
+    Private Class Employee
+        Public Property Id As String = String.Empty
+        Public Property Name As String = String.Empty
+        Public Property Department As String = String.Empty
+        Public Property Salary As Decimal
+        Public Property IsActive As Boolean
+        Public Property Joined As DateTime
+    End Class
+
     Private Function BuildListViewCard() As Control
         Dim card = CreateDemoCard()
         card.Controls.Add(DescriptionLabel("Native ListView in Details view with themed column headers and row selection."))
@@ -301,13 +410,16 @@ Public NotInheritable Class GalleryDataPresentationScreen
         advancedGrid.Columns.Add("Course", "Course")
         advancedGrid.Columns.Add("Batch", "Batch")
         advancedGrid.Columns.Add("Status", "Status")
-        advancedGrid.Columns.Add("Attendance", "Attendance")
+        Dim attendanceCol = New DataGridViewTextBoxColumn With {.DataPropertyName = "Attendance", .HeaderText = "Attendance", .Name = "Attendance"}
+        attendanceCol.DefaultCellStyle.Format = "P0"
+        advancedGrid.Columns.Add(attendanceCol)
 
-        advancedGrid.SummaryItems.Add("Attendance", DataGridViewSummaryAggregate.Avg, "Avg: {0}%")
+        advancedGrid.SummaryItems.Add("Attendance", DataGridViewSummaryAggregate.Avg, "Avg: {0:P0}")
 
         Dim students = GenerateStudents()
         For Each s In students
-            advancedGrid.Rows.Add(s.Id, s.Name, s.Course, s.Batch, s.Status, s.Attendance)
+            Dim attendanceValue = If(s.Attendance = 0D, 0D, s.Attendance / 100D)
+            advancedGrid.Rows.Add(s.Id, s.Name, s.Course, s.Batch, s.Status, attendanceValue)
         Next
 
         Dim topBar = New TableLayoutPanel With {
@@ -337,7 +449,7 @@ Public NotInheritable Class GalleryDataPresentationScreen
 
         Dim addButton = New NexaButton With {.Text = "Add Student", .Style = NexaButtonStyle.Primary, .AutoSize = True}
         AddHandler addButton.Click, Sub(sender, e)
-                                         advancedGrid.Rows.Add((students.Count + 1).ToString(), "New Student", "ICT", "2025-A", "Active", "0%")
+                                         advancedGrid.Rows.Add((students.Count + 1).ToString(), "New Student", "ICT", "2025-A", "Active", 0D)
                                      End Sub
 
         topBar.Controls.Add(searchBox, 0, 0)
@@ -363,21 +475,21 @@ Public NotInheritable Class GalleryDataPresentationScreen
 
     Private Shared Function GenerateStudents() As List(Of Student)
         Return New List(Of Student) From {
-            New Student With {.Id = "STU-001", .Name = "Kasun Perera", .Course = "ICT", .Batch = "2024-A", .Gender = "Male", .Telephone = "077-1234567", .Status = "Active", .Attendance = "92%"},
-            New Student With {.Id = "STU-002", .Name = "Nimal Silva", .Course = "ICT", .Batch = "2024-A", .Gender = "Male", .Telephone = "077-7654321", .Status = "Active", .Attendance = "88%"},
-            New Student With {.Id = "STU-003", .Name = "Amal Fernando", .Course = "English", .Batch = "2024-B", .Gender = "Male", .Telephone = "071-2345678", .Status = "Completed", .Attendance = "95%"},
-            New Student With {.Id = "STU-004", .Name = "Saman Kumara", .Course = "ICT", .Batch = "2024-A", .Gender = "Male", .Telephone = "072-3456789", .Status = "Active", .Attendance = "78%"},
-            New Student With {.Id = "STU-005", .Name = "Malini Fernando", .Course = "Business", .Batch = "2024-B", .Gender = "Female", .Telephone = "073-4567890", .Status = "Active", .Attendance = "91%"},
-            New Student With {.Id = "STU-006", .Name = "Dilshani Perera", .Course = "English", .Batch = "2024-C", .Gender = "Female", .Telephone = "074-5678901", .Status = "Completed", .Attendance = "97%"},
-            New Student With {.Id = "STU-007", .Name = "Ruwan Jayasinghe", .Course = "ICT", .Batch = "2024-A", .Gender = "Male", .Telephone = "075-6789012", .Status = "Active", .Attendance = "85%"},
-            New Student With {.Id = "STU-008", .Name = "Thilini Wickrama", .Course = "Business", .Batch = "2024-B", .Gender = "Female", .Telephone = "076-7890123", .Status = "Active", .Attendance = "89%"},
-            New Student With {.Id = "STU-009", .Name = "Chamara Dias", .Course = "ICT", .Batch = "2024-C", .Gender = "Male", .Telephone = "077-8901234", .Status = "On Leave", .Attendance = "45%"},
-            New Student With {.Id = "STU-010", .Name = "Nadeeka Liyanage", .Course = "English", .Batch = "2024-A", .Gender = "Female", .Telephone = "078-9012345", .Status = "Active", .Attendance = "93%"},
-            New Student With {.Id = "STU-011", .Name = "Buddhika Herath", .Course = "Business", .Batch = "2024-C", .Gender = "Male", .Telephone = "079-0123456", .Status = "Active", .Attendance = "81%"},
-            New Student With {.Id = "STU-012", .Name = "Shalika Ekanayake", .Course = "ICT", .Batch = "2024-B", .Gender = "Female", .Telephone = "070-1234567", .Status = "Completed", .Attendance = "96%"},
-            New Student With {.Id = "STU-013", .Name = "Mahesh Randeniya", .Course = "English", .Batch = "2024-B", .Gender = "Male", .Telephone = "071-2345679", .Status = "Active", .Attendance = "74%"},
-            New Student With {.Id = "STU-014", .Name = "Kusum Seneviratne", .Course = "Business", .Batch = "2024-A", .Gender = "Female", .Telephone = "072-3456780", .Status = "Active", .Attendance = "90%"},
-            New Student With {.Id = "STU-015", .Name = "Ravindra Bandara", .Course = "ICT", .Batch = "2024-C", .Gender = "Male", .Telephone = "073-4567891", .Status = "Active", .Attendance = "87%"}
+            New Student With {.Id = "STU-001", .Name = "Kasun Perera", .Course = "ICT", .Batch = "2024-A", .Gender = "Male", .Telephone = "077-1234567", .Status = "Active", .Attendance = 0.92D},
+            New Student With {.Id = "STU-002", .Name = "Nimal Silva", .Course = "ICT", .Batch = "2024-A", .Gender = "Male", .Telephone = "077-7654321", .Status = "Active", .Attendance = 0.88D},
+            New Student With {.Id = "STU-003", .Name = "Amal Fernando", .Course = "English", .Batch = "2024-B", .Gender = "Male", .Telephone = "071-2345678", .Status = "Completed", .Attendance = 0.95D},
+            New Student With {.Id = "STU-004", .Name = "Saman Kumara", .Course = "ICT", .Batch = "2024-A", .Gender = "Male", .Telephone = "072-3456789", .Status = "Active", .Attendance = 0.78D},
+            New Student With {.Id = "STU-005", .Name = "Malini Fernando", .Course = "Business", .Batch = "2024-B", .Gender = "Female", .Telephone = "073-4567890", .Status = "Active", .Attendance = 0.91D},
+            New Student With {.Id = "STU-006", .Name = "Dilshani Perera", .Course = "English", .Batch = "2024-C", .Gender = "Female", .Telephone = "074-5678901", .Status = "Completed", .Attendance = 0.97D},
+            New Student With {.Id = "STU-007", .Name = "Ruwan Jayasinghe", .Course = "ICT", .Batch = "2024-A", .Gender = "Male", .Telephone = "075-6789012", .Status = "Active", .Attendance = 0.85D},
+            New Student With {.Id = "STU-008", .Name = "Thilini Wickrama", .Course = "Business", .Batch = "2024-B", .Gender = "Female", .Telephone = "076-7890123", .Status = "Active", .Attendance = 0.89D},
+            New Student With {.Id = "STU-009", .Name = "Chamara Dias", .Course = "ICT", .Batch = "2024-C", .Gender = "Male", .Telephone = "077-8901234", .Status = "On Leave", .Attendance = 0.45D},
+            New Student With {.Id = "STU-010", .Name = "Nadeeka Liyanage", .Course = "English", .Batch = "2024-A", .Gender = "Female", .Telephone = "078-9012345", .Status = "Active", .Attendance = 0.93D},
+            New Student With {.Id = "STU-011", .Name = "Buddhika Herath", .Course = "Business", .Batch = "2024-C", .Gender = "Male", .Telephone = "079-0123456", .Status = "Active", .Attendance = 0.81D},
+            New Student With {.Id = "STU-012", .Name = "Shalika Ekanayake", .Course = "ICT", .Batch = "2024-B", .Gender = "Female", .Telephone = "070-1234567", .Status = "Completed", .Attendance = 0.96D},
+            New Student With {.Id = "STU-013", .Name = "Mahesh Randeniya", .Course = "English", .Batch = "2024-B", .Gender = "Male", .Telephone = "071-2345679", .Status = "Active", .Attendance = 0.74D},
+            New Student With {.Id = "STU-014", .Name = "Kusum Seneviratne", .Course = "Business", .Batch = "2024-A", .Gender = "Female", .Telephone = "072-3456780", .Status = "Active", .Attendance = 0.90D},
+            New Student With {.Id = "STU-015", .Name = "Ravindra Bandara", .Course = "ICT", .Batch = "2024-C", .Gender = "Male", .Telephone = "073-4567891", .Status = "Active", .Attendance = 0.87D}
         }
     End Function
 
@@ -447,7 +559,7 @@ Public NotInheritable Class GalleryDataPresentationScreen
         Public Property Gender As String = String.Empty
         Public Property Telephone As String = String.Empty
         Public Property Status As String = String.Empty
-        Public Property Attendance As String = String.Empty
+        Public Property Attendance As Decimal
     End Class
 
     Private Class DemoAppSettings
