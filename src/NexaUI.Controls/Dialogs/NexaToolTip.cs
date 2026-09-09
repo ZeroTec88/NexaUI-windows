@@ -38,7 +38,7 @@ public sealed class NexaToolTip : Component
             ShowInTaskbar = false,
             StartPosition = FormStartPosition.Manual,
             TopMost = true,
-            BackColor = Color.Transparent,
+            BackColor = SystemColors.Info,
             Opacity = 0,
             Size = new Size(200, 40)
         };

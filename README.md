@@ -53,7 +53,7 @@ NexaUI.Tests    -> NexaUI.Core, NexaUI.Themes, NexaUI.Icons, NexaUI.Controls
 
 ## Current Status
 
-**Phase 11 - Navigation Controls.**
+**Phase 13 - Data Presentation Controls.**
 
 Implemented controls:
 
@@ -87,12 +87,17 @@ Implemented controls:
 - `NexaBreadcrumbItem` — breadcrumb item with text, key, and enabled state
 - `NexaStepper` — multi-step workflow control with horizontal/vertical orientations
 - `NexaStep` — step item with title, description, state (Pending/Current/Completed/Error/Disabled)
+- `NexaDataGridView` — theme-aware DataGridView with row numbers, grid styles, header styles, and alternate rows
+- `NexaListView` — theme-aware ListView with Details view styling, alternating rows, and custom headers
+- `NexaPropertyGrid` — theme-aware PropertyGrid with styled categories, help, and command areas
+- `NexaTreeView` — theme-aware TreeView with custom node drawing, lines, checkboxes, and expand/collapse indicators
 
 Both demo applications (`NexaUI.Demo.CSharp`, `NexaUI.Demo.VB`) include a
 gallery shell with Getting Started, Themes, Basic Controls, Input Controls,
-Selection Controls, Layout Controls, Feedback Controls, and Navigation Controls pages.
-The Navigation Controls page includes a complete Application Shell example
-combining NavigationBar, Breadcrumb, TabControl, and content area.
+Selection Controls, Layout Controls, Feedback Controls, Navigation Controls,
+and Data Presentation pages. The Navigation Controls page includes a complete
+Application Shell example combining NavigationBar, Breadcrumb, TabControl, and
+content area.
 
 See `NEXAUI_RULES.md` for the permanent development rules that govern
 this project.
@@ -953,3 +958,330 @@ Dim step As New NexaStep("account", "Account", "Create your account") With {
 ```
 
 `NexaStepState`: `Pending`, `Current`, `Completed`, `Error`, `Disabled`.
+
+### NexaMessageBox
+A themed message box dialog with customizable buttons, icons, and styling.
+Replaces the standard `MessageBox` with a fully themeable alternative.
+
+```csharp
+var result = NexaMessageBox.ShowInformation(null, "Operation completed successfully!", "Success");
+result = NexaMessageBox.ShowSuccess(null, "Data saved successfully", "Saved");
+result = NexaMessageBox.ShowWarning(null, "This action may affect existing data.", "Warning");
+result = NexaMessageBox.ShowError(null, "The requested operation could not be completed.", "Error");
+result = NexaMessageBox.ShowQuestion(null, "Are you sure you want to continue?", "Confirm");
+result = NexaMessageBox.ShowConfirm(null, "Save changes before closing?", "Unsaved Changes");
+
+// Custom buttons
+result = NexaMessageBox.Show(
+    null,
+    "Choose an action for the selected items.",
+    "Bulk Actions",
+    NexaDialogStyle.Standard,
+    ("Apply All", NexaDialogResult.Yes, NexaButtonStyle.Primary, true),
+    ("Apply Selected", NexaDialogResult.OK, NexaButtonStyle.Secondary, false),
+    ("Skip", NexaDialogResult.No, NexaButtonStyle.Ghost, false),
+    ("Cancel", NexaDialogResult.Cancel, NexaButtonStyle.Ghost, false)
+);
+```
+
+```vb
+Dim result = NexaMessageBox.ShowInformation(Nothing, "Operation completed successfully!", "Success")
+result = NexaMessageBox.ShowSuccess(Nothing, "Data saved successfully", "Saved")
+result = NexaMessageBox.ShowWarning(Nothing, "This action may affect existing data.", "Warning")
+result = NexaMessageBox.ShowError(Nothing, "The requested operation could not be completed.", "Error")
+result = NexaMessageBox.ShowQuestion(Nothing, "Are you sure you want to continue?", "Confirm")
+result = NexaMessageBox.ShowConfirm(Nothing, "Save changes before closing?", "Unsaved Changes")
+
+' Custom buttons
+result = NexaMessageBox.Show(
+    Nothing,
+    "Choose an action for the selected items.",
+    "Bulk Actions",
+    NexaDialogStyle.Standard,
+    ("Apply All", NexaDialogResult.Yes, NexaButtonStyle.Primary, True),
+    ("Apply Selected", NexaDialogResult.OK, NexaButtonStyle.Secondary, False),
+    ("Skip", NexaDialogResult.No, NexaButtonStyle.Ghost, False),
+    ("Cancel", NexaDialogResult.Cancel, NexaButtonStyle.Ghost, False)
+)
+```
+
+`NexaDialogResult`: `None`, `OK`, `Cancel`, `Yes`, `No`, `Retry`, `Abort`, `Ignore`, `Close`.
+`NexaDialogStyle`: `Standard`, `Compact`, `FullWidth`, `Card`.
+
+### NexaInputDialog
+A themed input dialog for getting text input from the user.
+
+```csharp
+var (result, text) = NexaInputDialog.ShowInput(null, "Enter your name:", "Enter Name", "John Doe");
+if (result == NexaDialogResult.OK) Console.WriteLine($"Name: {text}");
+
+var (result, text) = NexaInputDialog.ShowMultilineInput(null, "Enter your feedback:", "Feedback", "Type here...");
+```
+
+```vb
+Dim (result, text) = NexaInputDialog.ShowInput(Nothing, "Enter your name:", "Enter Name", "John Doe")
+If result = NexaDialogResult.OK Then Console.WriteLine($"Name: {text}")
+
+Dim (result, text) = NexaInputDialog.ShowMultilineInput(Nothing, "Enter your feedback:", "Feedback", "Type here...")
+```
+
+### NexaToast
+A toast notification with auto-dismiss, stacking, and multiple styles.
+
+```csharp
+var manager = new NexaToastManager(this);
+manager.ShowInfo("Information toast");
+manager.ShowSuccess("Operation completed successfully");
+manager.ShowWarning("Please review your changes");
+manager.ShowError("Failed to save the document");
+
+// Or use static method
+NexaToast.Show(this, "Message", "Title", NexaToastStyle.Success, NexaToastPosition.TopRight, 5000);
+```
+
+```vb
+Dim manager = New NexaToastManager(Me)
+manager.ShowInfo("Information toast")
+manager.ShowSuccess("Operation completed successfully")
+manager.ShowWarning("Please review your changes")
+manager.ShowError("Failed to save the document")
+```
+
+`NexaToastStyle`: `Default`, `Success`, `Warning`, `Error`, `Info`.
+`NexaToastPosition`: `TopLeft`, `TopCenter`, `TopRight`, `BottomLeft`, `BottomCenter`, `BottomRight`.
+
+### NexaToolTip
+A themed tooltip with fade animations and configurable positioning.
+
+```csharp
+var tip = new NexaToolTip
+{
+    InitialDelay = 300,
+    AutoPopDelay = 5000,
+    Position = NexaTooltipPosition.Top
+};
+tip.SetToolTip(btn, "This tooltip appears on top of the button.");
+```
+
+```vb
+Dim tip = New NexaToolTip With {
+    .InitialDelay = 300,
+    .AutoPopDelay = 5000,
+    .Position = NexaTooltipPosition.Top
+}
+tip.SetToolTip(btn, "This tooltip appears on top of the button.")
+```
+
+`NexaTooltipPosition`: `Top`, `Bottom`, `Left`, `Right`.
+
+### NexaPopover
+A rich popover with title, content, and flexible positioning.
+
+```csharp
+var popover = new NexaPopover
+{
+    Title = "Popover Title",
+    Position = NexaPopoverPosition.Bottom,
+    Width = 280,
+    Height = 160,
+    ShowCloseButton = true
+};
+popover.ContentPanel.Controls.Add(new NexaLabel { Text = "Rich content here..." });
+popover.ContentPanel.Controls.Add(new NexaButton { Text = "Action" });
+popover.Show(btn, NexaPopoverPosition.Bottom);
+```
+
+```vb
+Dim popover = New NexaPopover With {
+    .Title = "Popover Title",
+    .Position = NexaPopoverPosition.Bottom,
+    .Width = 280,
+    .Height = 160,
+    .ShowCloseButton = True
+}
+popover.ContentPanel.Controls.Add(New NexaLabel With {.Text = "Rich content here..."})
+popover.ContentPanel.Controls.Add(New NexaButton With {.Text = "Action"})
+popover.Show(btn, NexaPopoverPosition.Bottom)
+```
+
+`NexaPopoverPosition`: `Top`, `Bottom`, `Left`, `Right`, `TopLeft`, `TopRight`, `BottomLeft`, `BottomRight`.
+
+### NexaLoadingOverlay
+A full-screen or container-scoped loading overlay with spinner, title, and message.
+
+```csharp
+var overlay = new NexaLoadingOverlay
+{
+    Title = "Processing Data",
+    Message = "Please wait while we fetch the data...",
+    OverlayStyle = NexaOverlayStyle.Standard,
+    Dock = DockStyle.Fill
+};
+overlay.Show();
+// ... do work ...
+overlay.Hide();
+```
+
+```vb
+Dim overlay = New NexaLoadingOverlay With {
+    .Title = "Processing Data",
+    .Message = "Please wait while we fetch the data...",
+    .OverlayStyle = NexaOverlayStyle.Standard,
+    .Dock = DockStyle.Fill
+}
+overlay.Show()
+' ... do work ...
+overlay.Hide()
+```
+
+`NexaOverlayStyle`: `Standard`, `Light`, `Blur`, `Minimal`.
+
+### NexaModalBackground
+A semi-transparent modal background overlay for dialogs and drawers.
+
+```csharp
+var modalBg = new NexaModalBackground
+{
+    OverlayStyle = NexaOverlayStyle.Standard,
+    ClickToClose = true,
+    Dock = DockStyle.Fill
+};
+var content = new NexaCard { Title = "Confirm", Width = 400, Height = 200 };
+modalBg.ShowWithContent(content);
+```
+
+```vb
+Dim modalBg = New NexaModalBackground With {
+    .OverlayStyle = NexaOverlayStyle.Standard,
+    .ClickToClose = True,
+    .Dock = DockStyle.Fill
+}
+Dim content = New NexaCard With {.Title = "Confirm", .Width = 400, .Height = 200}
+modalBg.ShowWithContent(content)
+```
+```
+
+`NexaOverlayStyle`: `Standard`, `Light`, `Blur`, `Minimal`.
+
+### NexaDataGridView
+
+A theme-aware DataGridView that inherits from `System.Windows.Forms.DataGridView`.
+Preserves all native functionality (columns, rows, data binding, sorting, editing,
+virtual mode) while adding modern NexaUI styling.
+
+```csharp
+var grid = new NexaDataGridView
+{
+    Dock = DockStyle.Fill,
+    GridStyle = NexaGridStyle.Default,
+    HeaderStyle = NexaHeaderStyle.Standard,
+    ShowRowNumbers = true,
+    AlternateRowColors = true,
+    ReadOnly = true
+};
+```
+
+```vb
+Dim grid = New NexaDataGridView With {
+    .Dock = DockStyle.Fill,
+    .GridStyle = NexaGridStyle.Default,
+    .HeaderStyle = NexaHeaderStyle.Standard,
+    .ShowRowNumbers = True,
+    .AlternateRowColors = True,
+    .ReadOnly = True
+}
+```
+
+`NexaGridStyle`: `Default`, `Compact`, `Comfortable`.
+
+`NexaHeaderStyle`: `Standard`, `Emphasized`, `Minimal`.
+
+### NexaListView
+
+A theme-aware ListView that inherits from `System.Windows.Forms.ListView`.
+Preserves all native functionality (items, groups, columns, views, selection,
+checkboxes, image lists) while adding modern NexaUI styling.
+
+```csharp
+var list = new NexaListView
+{
+    Dock = DockStyle.Fill,
+    View = View.Details,
+    FullRowSelect = true,
+    ListStyle = NexaListStyle.Default
+};
+```
+
+```vb
+Dim list = New NexaListView With {
+    .Dock = DockStyle.Fill,
+    .View = View.Details,
+    .FullRowSelect = True,
+    .ListStyle = NexaListStyle.Default
+}
+```
+
+`NexaListStyle`: `Default`, `Compact`, `Spacious`.
+
+### NexaPropertyGrid
+
+A theme-aware PropertyGrid that inherits from `System.Windows.Forms.PropertyGrid`.
+Preserves all native functionality (SelectedObject, property tabs, categorization,
+help area, commands, editing) while applying NexaUI colors.
+
+```csharp
+var propGrid = new NexaPropertyGrid
+{
+    Dock = DockStyle.Fill,
+    GridStyle = NexaPropertyGridStyle.Default,
+    HelpVisible = true,
+    ToolbarVisible = true,
+    PropertySort = PropertySort.Categorized
+};
+propGrid.SelectedObject = mySettingsObject;
+```
+
+```vb
+Dim propGrid = New NexaPropertyGrid With {
+    .Dock = DockStyle.Fill,
+    .GridStyle = NexaPropertyGridStyle.Default,
+    .HelpVisible = True,
+    .ToolbarVisible = True,
+    .PropertySort = PropertySort.Categorized
+}
+propGrid.SelectedObject = mySettingsObject
+```
+
+`NexaPropertyGridStyle`: `Default`, `Compact`, `Comfortable`.
+
+### NexaTreeView
+
+A theme-aware TreeView that inherits from `System.Windows.Forms.TreeView`.
+Preserves all native functionality (nodes, parent/child relationships, selection,
+checkboxes, image lists, label editing, sorting, drag/drop) while applying
+NexaUI styling.
+
+```csharp
+var tree = new NexaTreeView
+{
+    Dock = DockStyle.Fill,
+    TreeStyle = NexaTreeStyle.Default,
+    ShowRootLines = true,
+    ShowNodeLines = true,
+    CheckBoxes = true,
+    FullRowSelect = true
+};
+```
+
+```vb
+Dim tree = New NexaTreeView With {
+    .Dock = DockStyle.Fill,
+    .TreeStyle = NexaTreeStyle.Default,
+    .ShowRootLines = True,
+    .ShowNodeLines = True,
+    .CheckBoxes = True,
+    .FullRowSelect = True
+}
+```
+
+`NexaTreeStyle`: `Default`, `Compact`, `Spacious`.

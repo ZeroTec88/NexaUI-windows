@@ -19,6 +19,7 @@ Public NotInheritable Class GalleryShell
         ("layout", "Layout Controls", Function() New GalleryLayoutScreen()),
         ("feedback", "Feedback Controls", Function() New GalleryFeedbackScreen()),
         ("navigation", "Navigation Controls", Function() New GalleryNavigationScreen()),
+        ("datapresentation", "Data Presentation", Function() New GalleryDataPresentationScreen()),
         ("dialogs", "Dialogs", Function() New GalleryDialogsScreen())
     }
 
@@ -31,7 +32,7 @@ Public NotInheritable Class GalleryShell
         ("layout", "Layout Controls"),
         ("feedback", "Feedback Controls"),
         ("navigation", "Navigation Controls"),
-        ("datagrid", "DataGrid"),
+        ("datapresentation", "Data Presentation"),
         ("dialogs", "Dialogs"),
         ("advanced", "Advanced")
     }

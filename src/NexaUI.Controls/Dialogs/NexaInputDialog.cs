@@ -21,7 +21,7 @@ public sealed class NexaInputDialog : NexaDialog
     private string _placeholder = string.Empty;
     private bool _multiline = false;
 
-    private NexaInputDialog()
+    public NexaInputDialog()
     {
         _promptLabel = new Label
         {

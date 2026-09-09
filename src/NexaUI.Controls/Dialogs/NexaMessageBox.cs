@@ -19,7 +19,7 @@ public sealed class NexaMessageBox : NexaDialog
     private readonly TableLayoutPanel _mainLayout;
     private NexaIconKind _iconKind = NexaIconKind.Info;
 
-    private NexaMessageBox()
+    public NexaMessageBox()
     {
         _mainLayout = new TableLayoutPanel
         {

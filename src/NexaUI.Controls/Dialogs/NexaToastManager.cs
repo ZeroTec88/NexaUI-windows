@@ -7,7 +7,7 @@ namespace NexaUI.Controls;
 /// <summary>
 /// Manages multiple toast notifications, stacking them appropriately.
 /// </summary>
-public sealed class NexaToastManager
+public sealed class NexaToastManager : IDisposable
 {
     private readonly List<NexaToast> _activeToasts = new();
     private readonly IWin32Window? _owner;
@@ -77,6 +77,12 @@ public sealed class NexaToastManager
         {
             toast.CloseToast();
         }
+    }
+
+    /// <summary>Disposes the toast manager and closes all active toasts.</summary>
+    public void Dispose()
+    {
+        CloseAll();
     }
 
     private void RepositionToasts()

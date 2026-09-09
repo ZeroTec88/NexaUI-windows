@@ -21,6 +21,7 @@ public sealed class GalleryShell : Form
         ("layout", "Layout Controls", () => new GalleryLayoutScreen()),
         ("feedback", "Feedback Controls", () => new GalleryFeedbackScreen()),
         ("navigation", "Navigation Controls", () => new GalleryNavigationScreen()),
+        ("datapresentation", "Data Presentation", () => new GalleryDataPresentationScreen()),
         ("dialogs", "Dialogs", () => new GalleryDialogsScreen()),
     };
 
@@ -34,7 +35,7 @@ public sealed class GalleryShell : Form
         ("layout", "Layout Controls"),
         ("feedback", "Feedback Controls"),
         ("navigation", "Navigation Controls"),
-        ("datagrid", "DataGrid"),
+        ("datapresentation", "Data Presentation"),
         ("dialogs", "Dialogs"),
         ("advanced", "Advanced"),
     };

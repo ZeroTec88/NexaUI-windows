@@ -25,6 +25,9 @@ public sealed class GalleryDialogsScreen : UserControl
         AutoScroll = true;
         BackColor = (Color)ThemeManager.Current.Palette[NexaColorRole.Background].Value;
 
+        // Initialize shared components FIRST, before building UI
+        InitializeSharedComponents();
+
         _root = new TableLayoutPanel
         {
             Dock = DockStyle.Top,
@@ -96,9 +99,6 @@ public sealed class GalleryDialogsScreen : UserControl
 
         ThemeManager.ThemeChanged += OnThemeChanged;
         Disposed += OnSelfDisposed;
-
-        // Initialize shared components
-        InitializeSharedComponents();
     }
 
     private void OnSelfDisposed(object? sender, EventArgs e)
@@ -217,9 +217,9 @@ public sealed class GalleryDialogsScreen : UserControl
                 "Bulk Actions",
                 NexaDialogStyle.Standard,
                 ("Apply All", NexaDialogResult.Yes, NexaButtonStyle.Primary, true),
-                ("Apply Selected", NexaDialogResult.OK, NexaButtonStyle.Secondary),
-                ("Skip", NexaDialogResult.No, NexaButtonStyle.Ghost),
-                ("Cancel", NexaDialogResult.Cancel, NexaButtonStyle.Ghost)
+                ("Apply Selected", NexaDialogResult.OK, NexaButtonStyle.Secondary, false),
+                ("Skip", NexaDialogResult.No, NexaButtonStyle.Ghost, false),
+                ("Cancel", NexaDialogResult.Cancel, NexaButtonStyle.Ghost, false)
             );
             ShowResult(result);
         };
@@ -234,9 +234,9 @@ public sealed class GalleryDialogsScreen : UserControl
     {
         var style = result switch
         {
-            NexaDialogResult.OK or NexaDialogResult.Yes => NexaAlertStyle.Success,
-            NexaDialogResult.No or NexaDialogResult.Cancel => NexaAlertStyle.Warning,
-            _ => NexaAlertStyle.Info
+            NexaDialogResult.OK or NexaDialogResult.Yes => NexaToastStyle.Success,
+            NexaDialogResult.No or NexaDialogResult.Cancel => NexaToastStyle.Warning,
+            _ => NexaToastStyle.Info
         };
         _toastManager!.Show($"Dialog result: {result}", "Dialog Result", style);
     }
@@ -331,9 +331,8 @@ public sealed class GalleryDialogsScreen : UserControl
 
         for (var i = 0; i < toastTypes.Length; i++)
         {
-            var (label, style, text) = toastTypes[i];
-            var btn = new NexaButton { Text = label, Width = 140, Height = 40, Style = style switch { NexaToastStyle.Success => NexaButtonStyle.Success, NexaToastStyle.Warning => NexaButtonStyle.Warning, NexaToastStyle.Error => NexaButtonStyle.Danger, _ => NexaButtonStyle.Primary } };
-            var style = style;
+            var (label, toastStyle, text) = toastTypes[i];
+            var btn = new NexaButton { Text = label, Width = 140, Height = 40, Style = toastStyle switch { NexaToastStyle.Success => NexaButtonStyle.Success, NexaToastStyle.Warning => NexaButtonStyle.Warning, NexaToastStyle.Error => NexaButtonStyle.Danger, _ => NexaButtonStyle.Primary } };
             var t = text;
             btn.Click += (_, _) =>
             {
@@ -341,7 +340,7 @@ public sealed class GalleryDialogsScreen : UserControl
                           label.Contains("Bottom") ? NexaToastPosition.BottomCenter :
                           NexaToastPosition.TopRight;
                 var delay = label.Contains("10s") ? 10000 : label.Contains("Persistent") ? 0 : 5000;
-                _toastManager!.Show(t, label, style, pos, delay);
+                _toastManager!.Show(t, label, toastStyle, pos, delay);
             };
             grid.Controls.Add(btn, i % 4, i / 4);
         }
@@ -427,13 +426,13 @@ public sealed class GalleryDialogsScreen : UserControl
                 Margin = new Padding(8)
             };
 
-            var pos = pos;
+            var position = pos;
             btn.Click += (_, _) =>
             {
                 var popover = new NexaPopover
                 {
                     Title = $"Popover ({label})",
-                    Position = pos,
+                    Position = position,
                     Width = 280,
                     Height = 160,
                     ShowCloseButton = true
