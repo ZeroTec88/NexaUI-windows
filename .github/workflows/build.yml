@@ -33,11 +33,11 @@ jobs:
       run: dotnet test tests/NexaUI.Tests/NexaUI.Tests.csproj --configuration Release --no-build --filter "FullyQualifiedName~DataControlApiTests" --verbosity normal
 
     - name: Pack
-      run: dotnet pack NexaUI-windows.nuspec --configuration Release --no-build --output ./nuget
+      run: dotnet pack NexaUI-windows.nuspec --configuration Release --no-build --output ${{ runner.temp }}/nuget
 
     - name: List package
-      run: dir ./nuget/
+      run: dir ${{ runner.temp }}/nuget/
 
     - name: Publish to NuGet
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-      run: dotnet nuget push ./nuget/*.nupkg --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ${{ runner.temp }}/nuget/*.nupkg --source https://api.nuget.org/v3/index.json
