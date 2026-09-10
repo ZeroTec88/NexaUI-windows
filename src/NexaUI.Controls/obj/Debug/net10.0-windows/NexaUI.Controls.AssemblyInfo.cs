@@ -10,13 +10,17 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("NexaUI.Controls")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("ZeroTech")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © ZeroTech")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute(("A modern Windows Forms UI component library for .NET 10 with theme-aware controls" +
+    ", designer support, and full native behavior preservation."))]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a582463915fccca1a49e34dbb35ec831c658adf6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5316236c87c26e48dcc04d384c465d2b26f268fa")]
 [assembly: System.Reflection.AssemblyProductAttribute("NexaUI.Controls")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NexaUI.Controls")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyMetadataAttribute("RepositoryUrl", "https://github.com/your-org/NexaUI")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
 [assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]
 

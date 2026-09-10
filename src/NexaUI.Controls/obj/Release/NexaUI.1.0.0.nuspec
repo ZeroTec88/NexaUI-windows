@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>NexaUI</id>
+    <version>1.0.0</version>
+    <authors>ZeroTech</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/your-org/NexaUI</projectUrl>
+    <description>A modern Windows Forms UI component library for .NET 10 with theme-aware controls, designer support, and full native behavior preservation.</description>
+    <copyright>Copyright © ZeroTech</copyright>
+    <tags>winforms dotnet windows-forms ui controls theme designer csharp vbnet</tags>
+    <repository type="git" url="https://github.com/your-org/NexaUI" commit="5316236c87c26e48dcc04d384c465d2b26f268fa" />
+    <dependencies>
+      <group targetFramework="net10.0-windows7.0">
+        <dependency id="NexaUI.Core" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="NexaUI.Icons" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="NexaUI.Themes" version="1.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkReferences>
+      <group targetFramework="net10.0-windows7.0">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WindowsForms" />
+      </group>
+    </frameworkReferences>
+  </metadata>
+  <files>
+    <file src="D:\test_app\NexaUI\src\NexaUI.Controls\bin\Release\net10.0-windows\NexaUI.Controls.dll" target="lib\net10.0-windows7.0\NexaUI.Controls.dll" />
+    <file src="D:\test_app\NexaUI\README.md" target="\README.md" />
+    <file src="D:\test_app\NexaUI\NEXAUI_RULES.md" target="\NEXAUI_RULES.md" />
+  </files>
+</package>

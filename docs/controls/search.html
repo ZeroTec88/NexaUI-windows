@@ -183,6 +183,81 @@
         <h2>SearchBox</h2>
         <p>A themed search field built on top of NexaTextBox with a search glyph, clear button, and debounced SearchChanged event.</p>
 
+        <h3>How to Add NexaSearchBox Manually</h3>
+        <p><code>NexaSearchBox</code> inherits from <code>NexaTextBox</code>, so all native text input behavior is preserved. It adds a search icon, clear button, and debounced <code>SearchChanged</code> event.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution once to load NexaUI controls into the Toolbox.</li>
+            <li>Drag <code>NexaSearchBox</code> from the Toolbox onto your form.</li>
+            <li>Set <code>PlaceholderText</code>, <code>SearchDelayMs</code>, <code>Width</code>, and <code>Dock</code> in the Properties window.</li>
+            <li>Double-click to generate a <code>SearchChanged</code> handler.</li>
+        </ol>
+
+        <h4>Creating NexaSearchBox in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+
+public partial class SearchForm : Form
+{
+    public SearchForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildSearch();
+    }
+
+    private void BuildSearch()
+    {
+        var search = new NexaSearchBox
+        {
+            PlaceholderText = "Search students...",
+            SearchDelayMs = 250,
+            Width = 360,
+            Location = new Point(20, 20)
+        };
+        search.SearchChanged += (s, e) => RunSearch(search.SearchText);
+        search.Cleared += (s, e) => ClearResults();
+
+        Controls.Add(search);
+    }
+
+    private void RunSearch(string query)
+    {
+        // Filter your data source here
+        Console.WriteLine($"Searching: {query}");
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class SearchForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildSearch()
+    End Sub
+
+    Private Sub BuildSearch()
+        Dim search = New NexaSearchBox With {
+            .PlaceholderText = "Search students...",
+            .SearchDelayMs = 250,
+            .Width = 360,
+            .Location = New Point(20, 20)
+        }
+        AddHandler search.SearchChanged, Sub(s, e) RunSearch(search.SearchText)
+        AddHandler search.Cleared, Sub(s, e) ClearResults()
+
+        Controls.Add(search)
+    End Sub
+
+    Private Sub RunSearch(query As String)
+        ' Filter your data source here
+        Console.WriteLine($"Searching: {query}")
+    End Sub
+End Class</code></pre>
+
         <h3>Quick Start</h3>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var search = new NexaSearchBox
 {

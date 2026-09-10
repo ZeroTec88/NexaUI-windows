@@ -1,0 +1,11 @@
+D:\test_app\NexaUI\src\NexaUI.Core\bin\Release\net10.0-windows\NexaUI.Core.deps.json
+D:\test_app\NexaUI\src\NexaUI.Core\bin\Release\net10.0-windows\NexaUI.Core.dll
+D:\test_app\NexaUI\src\NexaUI.Core\bin\Release\net10.0-windows\NexaUI.Core.pdb
+D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\NexaUI.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\NexaUI.Core.AssemblyInfoInputs.cache
+D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\NexaUI.Core.AssemblyInfo.cs
+D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\NexaUI.Core.csproj.CoreCompileInputs.cache
+D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\NexaUI.Core.dll
+D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\refint\NexaUI.Core.dll
+D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\NexaUI.Core.pdb
+D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\ref\NexaUI.Core.dll

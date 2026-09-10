@@ -450,21 +450,99 @@ ThemeManager.SetTheme(New LightTheme())
 ' Or apply dark theme
 ThemeManager.SetTheme(New DarkTheme())</code></pre>
 
-            <h4>3. Use Controls</h4>
-            <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var button = new NexaButton
-{
-    Text = "Save",
-    Style = NexaButtonStyle.Primary,
-    Dock = DockStyle.Top
-};
-this.Controls.Add(button);</code></pre>
+            <h4>3. Add Controls Manually</h4>
+            <p>You can add NexaUI controls either by dragging them from the Toolbox or by creating them in code.</p>
 
-            <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Dim button As New NexaButton With {
-    .Text = "Save",
-    .Style = NexaButtonStyle.Primary,
-    .Dock = DockStyle.Top
-}
-Me.Controls.Add(button)</code></pre>
+            <h4>Option A: Using the Designer</h4>
+            <ol>
+                <li>Build the solution once so the controls appear in the Toolbox.</li>
+                <li>Open a Form in the Designer.</li>
+                <li>Drag a NexaUI control from the Toolbox onto the form.</li>
+                <li>Set its properties in the Properties window (Text, Style, Dock, etc.).</li>
+                <li>Double-click the control to wire up events like <code>Click</code>.</li>
+            </ol>
+
+            <h4>Option B: Creating Controls Programmatically</h4>
+            <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+
+public partial class MainForm : Form
+{
+    public MainForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        AddControlsManually();
+    }
+
+    private void AddControlsManually()
+    {
+        var nameInput = new NexaTextBox
+        {
+            Label = "Full name",
+            PlaceholderText = "Your full name",
+            Style = NexaInputStyle.Outline,
+            InputSize = NexaInputSize.Medium,
+            Width = 320,
+            Location = new Point(20, 20)
+        };
+
+        var saveButton = new NexaButton
+        {
+            Text = "Save",
+            Style = NexaButtonStyle.Primary,
+            Width = 120,
+            Location = new Point(20, 130)
+        };
+        saveButton.Click += (s, e) => Save(nameInput.Text);
+
+        Controls.Add(nameInput);
+        Controls.Add(saveButton);
+    }
+}</code></pre>
+
+            <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class MainForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        AddControlsManually()
+    End Sub
+
+    Private Sub AddControlsManually()
+        Dim nameInput = New NexaTextBox With {
+            .Label = "Full name",
+            .PlaceholderText = "Your full name",
+            .Style = NexaInputStyle.Outline,
+            .InputSize = NexaInputSize.Medium,
+            .Width = 320,
+            .Location = New Point(20, 20)
+        }
+
+        Dim saveButton = New NexaButton With {
+            .Text = "Save",
+            .Style = NexaButtonStyle.Primary,
+            .Width = 120,
+            .Location = New Point(20, 130)
+        }
+        AddHandler saveButton.Click, Sub(s, e) Save(nameInput.Text)
+
+        Controls.Add(nameInput)
+        Controls.Add(saveButton)
+    End Sub
+End Class</code></pre>
+
+            <h4>4. Handle Events</h4>
+            <p>All NexaUI controls expose standard WinForms events. Subscribe to them in code or via the Designer.</p>
+            <pre><code><span class="code-header"><span class="code-lang">C#</span></span>searchBox.SearchChanged += (s, e) => RunSearch(searchBox.SearchText);
+grid.RowDoubleClicked += (s, e) => EditRow(e.RowIndex);
+toggleSwitch.CheckedChanged += (s, e) => UpdateState(toggleSwitch.Checked);</code></pre>
+
+            <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>AddHandler searchBox.SearchChanged, Sub(s, e) RunSearch(searchBox.SearchText)
+AddHandler grid.RowDoubleClicked, Sub(s, e) EditRow(e.RowIndex)
+AddHandler toggleSwitch.CheckedChanged, Sub(s, e) UpdateState(toggleSwitch.Checked)</code></pre>
         </div>
 
         <div class="section">

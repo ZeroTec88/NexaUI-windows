@@ -2,7 +2,7 @@
   "version": 4,
   "targets": {
     "net10.0-windows": {
-      "NexaUI.Controls/1.0.0": {
+      "NexaUI/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
@@ -11,10 +11,10 @@
           "NexaUI.Themes": "1.0.0"
         },
         "compile": {
-          "bin/placeholder/NexaUI.Controls.dll": {}
+          "bin/placeholder/NexaUI.dll": {}
         },
         "runtime": {
-          "bin/placeholder/NexaUI.Controls.dll": {}
+          "bin/placeholder/NexaUI.dll": {}
         },
         "frameworkReferences": [
           "Microsoft.WindowsDesktop.App.WindowsForms"
@@ -65,7 +65,7 @@
     }
   },
   "libraries": {
-    "NexaUI.Controls/1.0.0": {
+    "NexaUI/1.0.0": {
       "type": "project",
       "path": "../../src/NexaUI.Controls/NexaUI.Controls.csproj",
       "msbuildProject": "../../src/NexaUI.Controls/NexaUI.Controls.csproj"
@@ -88,7 +88,7 @@
   },
   "projectFileDependencyGroups": {
     "net10.0-windows": [
-      "NexaUI.Controls >= 1.0.0",
+      "NexaUI >= 1.0.0",
       "NexaUI.Core >= 1.0.0",
       "NexaUI.Icons >= 1.0.0",
       "NexaUI.Themes >= 1.0.0"

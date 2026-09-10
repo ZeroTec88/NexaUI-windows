@@ -206,6 +206,96 @@
         <h2>NexaListView</h2>
         <p>A themed list view that inherits from <code>System.Windows.Forms.ListView</code> with NexaUI styling applied to subitems, groups, and column headers.</p>
 
+        <h3>How to Add NexaListView Manually</h3>
+        <p><code>NexaListView</code> inherits from <code>System.Windows.Forms.ListView</code>, so all native views (Details, List, LargeIcon, SmallIcon, Tile), groups, columns, and selection behavior are preserved.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution once to load NexaUI controls into the Toolbox.</li>
+            <li>Drag <code>NexaListView</code> from the Toolbox onto your form.</li>
+            <li>Set <code>View</code>, <code>Dock</code>, <code>FullRowSelect</code>, and <code>GridLines</code> in the Properties window.</li>
+            <li>Add columns using the Designer's <strong>Columns Editor</strong> (right-click → <strong>Edit Columns</strong>).</li>
+            <li>Add items in code-behind or at runtime.</li>
+        </ol>
+
+        <h4>Creating NexaListView in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using System.Windows.Forms;
+
+public partial class ReportsForm : Form
+{
+    public ReportsForm()
+    {
+        InitializeComponent();
+        BuildListView();
+    }
+
+    private void BuildListView()
+    {
+        var list = new NexaListView
+        {
+            Dock = DockStyle.Fill,
+            View = View.Details,
+            FullRowSelect = true,
+            GridLines = true,
+            ListStyle = NexaListStyle.Default
+        };
+
+        list.Columns.Add("Name", 220);
+        list.Columns.Add("Type", 120);
+        list.Columns.Add("Status", 100);
+
+        list.Items.Add(new ListViewItem(new[] { "Student List", "Data", "Ready" }));
+        list.Items.Add(new ListViewItem(new[] { "Course List", "Data", "Ready" }));
+        list.Items.Add(new ListViewItem(new[] { "Reports", "Document", "Ready" }));
+
+        list.SelectedIndexChanged += (s, e) =>
+        {
+            if (list.SelectedItems.Count > 0)
+            {
+                Console.WriteLine($"Selected: {list.SelectedItems[0].Text}");
+            }
+        };
+
+        Controls.Add(list);
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+
+Public Class ReportsForm
+    Public Sub New()
+        InitializeComponent()
+        BuildListView()
+    End Sub
+
+    Private Sub BuildListView()
+        Dim list = New NexaListView With {
+            .Dock = DockStyle.Fill,
+            .View = View.Details,
+            .FullRowSelect = True,
+            .GridLines = True,
+            .ListStyle = NexaListStyle.Default
+        }
+
+        list.Columns.Add("Name", 220)
+        list.Columns.Add("Type", 120)
+        list.Columns.Add("Status", 100)
+
+        list.Items.Add(New ListViewItem(New String() {"Student List", "Data", "Ready"}))
+        list.Items.Add(New ListViewItem(New String() {"Course List", "Data", "Ready"}))
+        list.Items.Add(New ListViewItem(New String() {"Reports", "Document", "Ready"}))
+
+        AddHandler list.SelectedIndexChanged, Sub(s, e)
+            If list.SelectedItems.Count > 0 Then
+                Console.WriteLine($"Selected: {list.SelectedItems(0).Text}")
+            End If
+        End Sub
+
+        Controls.Add(list)
+    End Sub
+End Class</code></pre>
+
         <h3>Quick Start</h3>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var list = new NexaListView
 {

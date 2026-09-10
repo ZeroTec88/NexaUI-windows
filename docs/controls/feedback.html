@@ -207,6 +207,127 @@
         <h2>Feedback Controls</h2>
         <p>NexaUI provides visual feedback controls for communicating status, progress, and notifications to users.</p>
 
+        <h3>How to Add Feedback Controls Manually</h3>
+        <p>Feedback controls like <code>NexaProgressBar</code>, <code>NexaBadge</code>, <code>NexaAlert</code>, and <code>NexaSpinner</code> can be added via the Designer or created in code.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution once to load NexaUI controls into the Toolbox.</li>
+            <li>Drag a feedback control from the Toolbox onto your form.</li>
+            <li>Set properties like <code>Text</code>, <code>Style</code>, <code>Dock</code>, and <code>Width</code> in the Properties window.</li>
+            <li>Wire events like <code>ValueChanged</code> or <code>Closed</code> in code-behind.</li>
+        </ol>
+
+        <h4>Creating feedback controls in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+
+public partial class ProcessingForm : Form
+{
+    public ProcessingForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildFeedback();
+    }
+
+    private void BuildFeedback()
+    {
+        var progress = new NexaProgressBar
+        {
+            Minimum = 0,
+            Maximum = 100,
+            Value = 0,
+            Style = NexaProgressBarStyle.Continuous,
+            ShowPercentage = true,
+            Width = 300,
+            Location = new Point(20, 20)
+        };
+
+        var badge = new NexaBadge
+        {
+            Text = "Processing",
+            BadgeStyle = NexaBadgeStyle.Info,
+            BadgeSize = NexaBadgeSize.Medium,
+            Location = new Point(20, 70)
+        };
+
+        var alert = new NexaAlert
+        {
+            AlertType = NexaAlertType.Success,
+            Title = "Done",
+            Message = "Operation completed successfully.",
+            Dismissible = true,
+            Width = 400,
+            Location = new Point(20, 120)
+        };
+        alert.Closed += (s, e) => Console.WriteLine("Alert closed");
+
+        var spinner = new NexaSpinner
+        {
+            SpinnerSize = NexaSpinnerSize.Medium,
+            AnimationEnabled = true,
+            Location = new Point(20, 220)
+        };
+
+        Controls.Add(progress);
+        Controls.Add(badge);
+        Controls.Add(alert);
+        Controls.Add(spinner);
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class ProcessingForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildFeedback()
+    End Sub
+
+    Private Sub BuildFeedback()
+        Dim progress = New NexaProgressBar With {
+            .Minimum = 0,
+            .Maximum = 100,
+            .Value = 0,
+            .Style = NexaProgressBarStyle.Continuous,
+            .ShowPercentage = True,
+            .Width = 300,
+            .Location = New Point(20, 20)
+        }
+
+        Dim badge = New NexaBadge With {
+            .Text = "Processing",
+            .BadgeStyle = NexaBadgeStyle.Info,
+            .BadgeSize = NexaBadgeSize.Medium,
+            .Location = New Point(20, 70)
+        }
+
+        Dim alert = New NexaAlert With {
+            .AlertType = NexaAlertType.Success,
+            .Title = "Done",
+            .Message = "Operation completed successfully.",
+            .Dismissible = True,
+            .Width = 400,
+            .Location = New Point(20, 120)
+        }
+        AddHandler alert.Closed, Sub(s, e) Console.WriteLine("Alert closed")
+
+        Dim spinner = New NexaSpinner With {
+            .SpinnerSize = NexaSpinnerSize.Medium,
+            .AnimationEnabled = True,
+            .Location = New Point(20, 220)
+        }
+
+        Controls.Add(progress)
+        Controls.Add(badge)
+        Controls.Add(alert)
+        Controls.Add(spinner)
+    End Sub
+End Class</code></pre>
+
         <h3>NexaProgressBar</h3>
         <p>A themed progress bar that inherits from <code>System.Windows.Forms.ProgressBar</code> with modern styling.</p>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var progress = new NexaProgressBar

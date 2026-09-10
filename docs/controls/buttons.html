@@ -206,6 +206,85 @@
         <h2>Buttons</h2>
         <p>NexaUI buttons inherit from native WinForms controls where possible, ensuring keyboard focus, accessibility, and standard click behavior are preserved.</p>
 
+        <h3>How to Add Buttons Manually</h3>
+        <p>Buttons can be added via the Designer or created in code. Use <code>NexaButton</code> for standard actions, <code>NexaIconButton</code> for toolbar actions, and <code>NexaSplitButton</code> for related sub-actions.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution to load NexaUI controls into the Toolbox.</li>
+            <li>Drag <code>NexaButton</code> or <code>NexaIconButton</code> onto your form.</li>
+            <li>Set <code>Text</code>, <code>ButtonStyle</code>, <code>Width</code>, and <code>Dock</code> in the Properties window.</li>
+            <li>Double-click the button to generate a <code>Click</code> handler.</li>
+        </ol>
+
+        <h4>Creating buttons in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+
+public partial class MainForm : Form
+{
+    public MainForm()
+    {
+        InitializeComponent();
+        AddToolbar();
+    }
+
+    private void AddToolbar()
+    {
+        var saveBtn = new NexaButton
+        {
+            Text = "Save",
+            Style = NexaButtonStyle.Primary,
+            Width = 100,
+            Height = 36,
+            Location = new Point(12, 12)
+        };
+        saveBtn.Click += (s, e) => SaveDocument();
+
+        var deleteBtn = new NexaButton
+        {
+            Text = "Delete",
+            Style = NexaButtonStyle.Danger,
+            Width = 100,
+            Height = 36,
+            Location = new Point(122, 12)
+        };
+
+        Controls.Add(saveBtn);
+        Controls.Add(deleteBtn);
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+
+Public Class MainForm
+    Public Sub New()
+        InitializeComponent()
+        AddToolbar()
+    End Sub
+
+    Private Sub AddToolbar()
+        Dim saveBtn = New NexaButton With {
+            .Text = "Save",
+            .Style = NexaButtonStyle.Primary,
+            .Width = 100,
+            .Height = 36,
+            .Location = New Point(12, 12)
+        }
+        AddHandler saveBtn.Click, Sub(s, e) SaveDocument()
+
+        Dim deleteBtn = New NexaButton With {
+            .Text = "Delete",
+            .Style = NexaButtonStyle.Danger,
+            .Width = 100,
+            .Height = 36,
+            .Location = New Point(122, 12)
+        }
+
+        Controls.Add(saveBtn)
+        Controls.Add(deleteBtn)
+    End Sub
+End Class</code></pre>
+
         <h3>NexaButton</h3>
         <p>A theme-aware push button that inherits from <code>System.Windows.Forms.Button</code>.</p>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var save = new NexaButton { Text = "Save", Width = 120 };

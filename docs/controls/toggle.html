@@ -183,6 +183,100 @@
         <h2>ToggleSwitch</h2>
         <p>An animated iOS-style on/off switch. No native WinForms equivalent exists, so NexaToggleSwitch is a lightweight custom control with owner-painted track and thumb.</p>
 
+        <h3>How to Add NexaToggleSwitch Manually</h3>
+        <p><code>NexaToggleSwitch</code> is a custom control with no native WinForms base class. It supports keyboard input (Space/Enter to toggle) and can be added via the Designer or in code.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution once to load NexaUI controls into the Toolbox.</li>
+            <li>Drag <code>NexaToggleSwitch</code> from the Toolbox onto your form.</li>
+            <li>Set <code>ToggleSize</code>, <code>OnText</code>, <code>OffText</code>, <code>ShowText</code>, and <code>Dock</code> in the Properties window.</li>
+            <li>Double-click to generate a <code>CheckedChanged</code> handler.</li>
+        </ol>
+
+        <h4>Creating NexaToggleSwitch in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+
+public partial class SettingsForm : Form
+{
+    public SettingsForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildToggles();
+    }
+
+    private void BuildToggles()
+    {
+        var notifications = new NexaToggleSwitch
+        {
+            OnText = "ON",
+            OffText = "OFF",
+            ShowText = true,
+            ToggleSize = NexaToggleSize.Medium,
+            AnimationEnabled = true,
+            Location = new Point(20, 20)
+        };
+        notifications.CheckedChanged += (s, e) =>
+        {
+            Console.WriteLine($"Notifications: {notifications.Checked}");
+        };
+
+        var darkMode = new NexaToggleSwitch
+        {
+            OnText = "ON",
+            OffText = "OFF",
+            ShowText = true,
+            ToggleSize = NexaToggleSize.Medium,
+            AnimationEnabled = true,
+            Location = new Point(20, 70)
+        };
+        darkMode.CheckedChanged += (s, e) => ToggleTheme(darkMode.Checked);
+
+        Controls.Add(notifications);
+        Controls.Add(darkMode);
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class SettingsForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildToggles()
+    End Sub
+
+    Private Sub BuildToggles()
+        Dim notifications = New NexaToggleSwitch With {
+            .OnText = "ON",
+            .OffText = "OFF",
+            .ShowText = True,
+            .ToggleSize = NexaToggleSize.Medium,
+            .AnimationEnabled = True,
+            .Location = New Point(20, 20)
+        }
+        AddHandler notifications.CheckedChanged, Sub(s, e)
+            Console.WriteLine($"Notifications: {notifications.Checked}")
+        End Sub
+
+        Dim darkMode = New NexaToggleSwitch With {
+            .OnText = "ON",
+            .OffText = "OFF",
+            .ShowText = True,
+            .ToggleSize = NexaToggleSize.Medium,
+            .AnimationEnabled = True,
+            .Location = New Point(20, 70)
+        }
+        AddHandler darkMode.CheckedChanged, Sub(s, e) ToggleTheme(darkMode.Checked)
+
+        Controls.Add(notifications)
+        Controls.Add(darkMode)
+    End Sub
+End Class</code></pre>
+
         <h3>Quick Start</h3>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var notifications = new NexaToggleSwitch
 {

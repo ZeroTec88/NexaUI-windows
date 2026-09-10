@@ -356,6 +356,207 @@ End Class</code></pre>
         </div>
 
         <div class="section">
+            <h3>Adding Controls Manually</h3>
+            <p>NexaUI controls can be added to forms in two ways: using the Visual Studio Designer, or by writing code. Both approaches produce the same result.</p>
+
+            <h4>Using the Visual Studio Designer</h4>
+            <p>The Designer workflow is the fastest way to build forms:</p>
+            <ol>
+                <li><strong>Build the solution</strong> once so NexaUI controls appear in the Toolbox.</li>
+                <li><strong>Open a Form</strong> in the Designer (double-click a .cs or .vb file).</li>
+                <li><strong>Drag a control</strong> from the Toolbox onto the form surface.</li>
+                <li><strong>Set properties</strong> in the Properties window (Text, Style, Dock, Width, etc.).</li>
+                <li><strong>Wire events</strong> by double-clicking the control or using the Events view in the Properties window.</li>
+            </ol>
+
+            <div class="alert alert-info">
+                <strong>Note:</strong> If you do not see NexaUI controls in the Toolbox, right-click the Toolbox, choose <strong>Choose Items...</strong>, and enable the NexaUI controls from the <strong>.NET Framework Components</strong> tab.
+            </div>
+
+            <h4>Creating Controls in Code</h4>
+            <p>For dynamic UIs or runtime-generated forms, create controls in code and add them to the form's <code>Controls</code> collection.</p>
+
+            <h5>Basic pattern</h5>
+            <pre><code><span class="code-header"><span class="code-lang">C#</span></span>// 1. Create the control
+var textBox = new NexaTextBox
+{
+    Label = "Email",
+    PlaceholderText = "you@example.com",
+    Width = 320
+};
+
+// 2. Subscribe to events
+textBox.TextChanged += (s, e) => ValidateEmail(textBox.Text);
+
+// 3. Add to the form
+Controls.Add(textBox);</code></pre>
+
+            <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>' 1. Create the control
+Dim textBox = New NexaTextBox With {
+    .Label = "Email",
+    .PlaceholderText = "you@example.com",
+    .Width = 320
+}
+
+' 2. Subscribe to events
+AddHandler textBox.TextChanged, Sub(s, e) ValidateEmail(textBox.Text)
+
+' 3. Add to the form
+Controls.Add(textBox)</code></pre>
+
+            <h5>Positioning and layout</h5>
+            <p>Set <code>Location</code> for absolute positioning, or use <code>Dock</code> and <code>Anchor</code> for layout-aware positioning:</p>
+            <pre><code><span class="code-header"><span class="code-lang">C#</span></span>// Dock to top (stacks vertically)
+var header = new NexaLabel { Text = "Settings", Dock = DockStyle.Top };
+
+// Anchor to all sides (fills container)
+var grid = new NexaDataGridView { Dock = DockStyle.Fill };
+
+// Absolute position
+var button = new NexaButton { Text = "OK", Location = new Point(20, 20) };</code></pre>
+
+            <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>' Dock to top (stacks vertically)
+Dim header = New NexaLabel With {.Text = "Settings", .Dock = DockStyle.Top}
+
+' Anchor to all sides (fills container)
+Dim grid = New NexaDataGridView With {.Dock = DockStyle.Fill}
+
+' Absolute position
+Dim button = New NexaButton With {.Text = "OK", .Location = New Point(20, 20)}</code></pre>
+
+            <h5>Complete form example</h5>
+            <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+
+public partial class LoginForm : Form
+{
+    public LoginForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildLoginForm();
+    }
+
+    private void BuildLoginForm()
+    {
+        var card = new NexaCard
+        {
+            Title = "Sign In",
+            Subtitle = "Enter your credentials",
+            Width = 420,
+            Height = 360,
+            CornerRadius = 8,
+            ShadowEnabled = true
+        };
+
+        var username = new NexaTextBox
+        {
+            Label = "Username",
+            PlaceholderText = "Enter username",
+            Icon = NexaIconKind.User,
+            Width = 360,
+            Dock = DockStyle.Top
+        };
+
+        var password = new NexaTextBox
+        {
+            Label = "Password",
+            PlaceholderText = "Enter password",
+            UseSystemPasswordChar = true,
+            Width = 360,
+            Dock = DockStyle.Top
+        };
+
+        var remember = new NexaCheckBox
+        {
+            Text = "Remember me",
+            Checked = true,
+            Dock = DockStyle.Top
+        };
+
+        var loginBtn = new NexaButton
+        {
+            Text = "Sign In",
+            Style = NexaButtonStyle.Primary,
+            Width = 120,
+            Height = 40,
+            Dock = DockStyle.Top
+        };
+        loginBtn.Click += (s, e) => AttemptLogin(username.Text, password.Text);
+
+        var content = card.ContentPanel;
+        content.Controls.Add(loginBtn);
+        content.Controls.Add(remember);
+        content.Controls.Add(password);
+        content.Controls.Add(username);
+
+        Controls.Add(card);
+    }
+}</code></pre>
+
+            <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class LoginForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildLoginForm()
+    End Sub
+
+    Private Sub BuildLoginForm()
+        Dim card = New NexaCard With {
+            .Title = "Sign In",
+            .Subtitle = "Enter your credentials",
+            .Width = 420,
+            .Height = 360,
+            .CornerRadius = 8,
+            .ShadowEnabled = True
+        }
+
+        Dim username = New NexaTextBox With {
+            .Label = "Username",
+            .PlaceholderText = "Enter username",
+            .Icon = NexaIconKind.User,
+            .Width = 360,
+            .Dock = DockStyle.Top
+        }
+
+        Dim password = New NexaTextBox With {
+            .Label = "Password",
+            .PlaceholderText = "Enter password",
+            .UseSystemPasswordChar = True,
+            .Width = 360,
+            .Dock = DockStyle.Top
+        }
+
+        Dim remember = New NexaCheckBox With {
+            .Text = "Remember me",
+            .Checked = True,
+            .Dock = DockStyle.Top
+        }
+
+        Dim loginBtn = New NexaButton With {
+            .Text = "Sign In",
+            .Style = NexaButtonStyle.Primary,
+            .Width = 120,
+            .Height = 40,
+            .Dock = DockStyle.Top
+        }
+        AddHandler loginBtn.Click, Sub(s, e) AttemptLogin(username.Text, password.Text)
+
+        Dim content = card.ContentPanel
+        content.Controls.Add(loginBtn)
+        content.Controls.Add(remember)
+        content.Controls.Add(password)
+        content.Controls.Add(username)
+
+        Controls.Add(card)
+    End Sub
+End Class</code></pre>
+        </div>
+
+        <div class="section">
             <h3>Theme Switching at Runtime</h3>
             <p>Switch themes dynamically without recreating your application:</p>
             <pre><code><span class="code-header"><span class="code-lang">C#</span></span>// Toggle between light and dark themes

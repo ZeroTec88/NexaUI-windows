@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NexaUI.Demo.CSharp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a582463915fccca1a49e34dbb35ec831c658adf6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5316236c87c26e48dcc04d384c465d2b26f268fa")]
 [assembly: System.Reflection.AssemblyProductAttribute("NexaUI.Demo.CSharp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NexaUI.Demo.CSharp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

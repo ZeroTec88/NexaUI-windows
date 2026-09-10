@@ -206,6 +206,102 @@
         <h2>NexaTreeView</h2>
         <p>A themed tree view that inherits from <code>System.Windows.Forms.TreeView</code> with modern styling for nodes, selection, and expand/collapse indicators.</p>
 
+        <h3>How to Add NexaTreeView Manually</h3>
+        <p><code>NexaTreeView</code> inherits from <code>System.Windows.Forms.TreeView</code>, so all native node, selection, and keyboard behavior is preserved. Add it via the Designer or in code.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution once to load NexaUI controls into the Toolbox.</li>
+            <li>Drag <code>NexaTreeView</code> from the Toolbox onto your form.</li>
+            <li>Set <code>Dock</code>, <code>ShowLines</code>, <code>ShowPlusMinus</code>, and <code>CheckBoxes</code> in the Properties window.</li>
+            <li>Add nodes in the Designer's <strong>Nodes Editor</strong> (right-click → <strong>Edit Nodes</strong>).</li>
+            <li>Wire the <code>AfterSelect</code> event in code-behind.</li>
+        </ol>
+
+        <h4>Creating NexaTreeView in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+using System.Windows.Forms;
+
+public partial class ExplorerForm : Form
+{
+    public ExplorerForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildTree();
+    }
+
+    private void BuildTree()
+    {
+        var tree = new NexaTreeView
+        {
+            Dock = DockStyle.Fill,
+            ShowLines = true,
+            ShowPlusMinus = true,
+            FullRowSelect = true,
+            CheckBoxes = true
+        };
+
+        var root = tree.Nodes.Add("NexaUI Application");
+        var dashboard = root.Nodes.Add("Dashboard");
+
+        var students = root.Nodes.Add("Students");
+        students.Nodes.Add("All Students");
+        students.Nodes.Add("Active Students");
+        students.Nodes.Add("Graduated Students");
+
+        var courses = root.Nodes.Add("Courses");
+        courses.Nodes.Add("ICT");
+        courses.Nodes.Add("English");
+        courses.Nodes.Add("Business");
+
+        root.Expand();
+
+        tree.AfterSelect += (s, e) => LoadDetails(e.Node.Text);
+        Controls.Add(tree);
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class ExplorerForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildTree()
+    End Sub
+
+    Private Sub BuildTree()
+        Dim tree = New NexaTreeView With {
+            .Dock = DockStyle.Fill,
+            .ShowLines = True,
+            .ShowPlusMinus = True,
+            .FullRowSelect = True,
+            .CheckBoxes = True
+        }
+
+        Dim root = tree.Nodes.Add("NexaUI Application")
+        Dim dashboard = root.Nodes.Add("Dashboard")
+
+        Dim students = root.Nodes.Add("Students")
+        students.Nodes.Add("All Students")
+        students.Nodes.Add("Active Students")
+        students.Nodes.Add("Graduated Students")
+
+        Dim courses = root.Nodes.Add("Courses")
+        courses.Nodes.Add("ICT")
+        courses.Nodes.Add("English")
+        courses.Nodes.Add("Business")
+
+        root.Expand()
+
+        AddHandler tree.AfterSelect, Sub(s, e) LoadDetails(e.Node.Text)
+        Controls.Add(tree)
+    End Sub
+End Class</code></pre>
+
         <h3>Quick Start</h3>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var tree = new NexaTreeView
 {

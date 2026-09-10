@@ -206,6 +206,111 @@
         <h2>NexaDataGridView</h2>
         <p>A modernized data grid that wraps <code>System.Windows.Forms.DataGridView</code> with NexaUI theming, command columns, and built-in status/summary/search panels.</p>
 
+        <h3>How to Add NexaDataGridView Manually</h3>
+        <p><code>NexaDataGridView</code> inherits from <code>System.Windows.Forms.DataGridView</code>, so all native data-binding, column, and selection behavior is preserved. You can add it via the Designer or in code.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution once to load NexaUI controls into the Toolbox.</li>
+            <li>Drag <code>NexaDataGridView</code> from the Toolbox onto your form.</li>
+            <li>Set <code>Dock</code>, <code>AutoGenerateColumns</code>, <code>ReadOnly</code>, and other properties in the Properties window.</li>
+            <li>Add columns in the Designer column editor or in code.</li>
+            <li>Wire events like <code>SelectionChanged</code>, <code>RowDoubleClicked</code>, or <code>CommandClicked</code> in code-behind.</li>
+        </ol>
+
+        <h4>Creating NexaDataGridView in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+using System.Windows.Forms;
+
+public partial class StudentsForm : Form
+{
+    public StudentsForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildGrid();
+    }
+
+    private void BuildGrid()
+    {
+        var grid = new NexaDataGridView
+        {
+            Dock = DockStyle.Fill,
+            ReadOnly = true,
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+            MultiSelect = true,
+            EnableSummaryPanel = true,
+            EnableSearchPanel = true
+        };
+
+        grid.Columns.Add("Id", "Student ID");
+        grid.Columns.Add("Name", "Student Name");
+        grid.Columns.Add("Course", "Course");
+        grid.Columns.Add("Status", "Status");
+
+        var students = GenerateStudents();
+        foreach (var s in students)
+        {
+            grid.Rows.Add(s.Id, s.Name, s.Course, s.Status);
+        }
+
+        grid.SelectionChanged += (s, e) =>
+        {
+            if (grid.SelectedRows.Count > 0)
+            {
+                var row = grid.SelectedRows[0];
+                Console.WriteLine($"Selected: {row.Cells[1].Value}");
+            }
+        };
+
+        Controls.Add(grid);
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class StudentsForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildGrid()
+    End Sub
+
+    Private Sub BuildGrid()
+        Dim grid = New NexaDataGridView With {
+            .Dock = DockStyle.Fill,
+            .ReadOnly = True,
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+            .MultiSelect = True,
+            .EnableSummaryPanel = True,
+            .EnableSearchPanel = True
+        }
+
+        grid.Columns.Add("Id", "Student ID")
+        grid.Columns.Add("Name", "Student Name")
+        grid.Columns.Add("Course", "Course")
+        grid.Columns.Add("Status", "Status")
+
+        Dim students = GenerateStudents()
+        For Each s In students
+            grid.Rows.Add(s.Id, s.Name, s.Course, s.Status)
+        Next
+
+        AddHandler grid.SelectionChanged, Sub(sender, e)
+            If grid.SelectedRows.Count > 0 Then
+                Dim row = grid.SelectedRows(0)
+                Console.WriteLine($"Selected: {row.Cells(1).Value}")
+            End If
+        End Sub
+
+        Controls.Add(grid)
+    End Sub
+End Class</code></pre>
+
         <h3>Quick Start</h3>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var grid = new NexaDataGridView
 {

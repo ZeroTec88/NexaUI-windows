@@ -206,6 +206,108 @@
         <h2>Layout</h2>
         <p>NexaUI provides containers that enhance the standard WinForms layout experience with modern styling and theming support.</p>
 
+        <h3>How to Add Layout Controls Manually</h3>
+        <p>Layout controls like <code>NexaPanel</code>, <code>NexaCard</code>, <code>NexaGroupBox</code>, <code>NexaFlowPanel</code>, and <code>NexaTablePanel</code> can be added via the Designer or in code. They inherit from native WinForms containers, so all standard layout behavior is preserved.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution once to load NexaUI controls into the Toolbox.</li>
+            <li>Drag a layout control (e.g., <code>NexaCard</code>, <code>NexaPanel</code>) from the Toolbox onto your form.</li>
+            <li>Set properties like <code>Dock</code>, <code>Padding</code>, <code>CornerRadius</code>, and <code>ShadowEnabled</code> in the Properties window.</li>
+            <li>Drag child controls into the container. For <code>NexaCard</code>, add controls to <code>card.ContentPanel</code> or <code>card.FooterPanel</code>.</li>
+        </ol>
+
+        <h4>Creating layout controls in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+
+public partial class SettingsForm : Form
+{
+    public SettingsForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildSettingsUI();
+    }
+
+    private void BuildSettingsUI()
+    {
+        var card = new NexaCard
+        {
+            Title = "Account Settings",
+            Subtitle = "Manage your profile",
+            Dock = DockStyle.Fill,
+            CornerRadius = 8,
+            ShadowEnabled = true,
+            Padding = new Padding(16)
+        };
+
+        var nameInput = new NexaTextBox
+        {
+            Label = "Display Name",
+            PlaceholderText = "Your name",
+            Width = 360,
+            Dock = DockStyle.Top,
+            Margin = new Padding(0, 0, 0, 12)
+        };
+
+        var saveBtn = new NexaButton
+        {
+            Text = "Save Changes",
+            Style = NexaButtonStyle.Primary,
+            Width = 120,
+            Dock = DockStyle.Top
+        };
+        saveBtn.Click += (s, e) => SaveSettings(nameInput.Text);
+
+        card.ContentPanel.Controls.Add(saveBtn);
+        card.ContentPanel.Controls.Add(nameInput);
+        Controls.Add(card);
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class SettingsForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildSettingsUI()
+    End Sub
+
+    Private Sub BuildSettingsUI()
+        Dim card = New NexaCard With {
+            .Title = "Account Settings",
+            .Subtitle = "Manage your profile",
+            .Dock = DockStyle.Fill,
+            .CornerRadius = 8,
+            .ShadowEnabled = True,
+            .Padding = New Padding(16)
+        }
+
+        Dim nameInput = New NexaTextBox With {
+            .Label = "Display Name",
+            .PlaceholderText = "Your name",
+            .Width = 360,
+            .Dock = DockStyle.Top,
+            .Margin = New Padding(0, 0, 0, 12)
+        }
+
+        Dim saveBtn = New NexaButton With {
+            .Text = "Save Changes",
+            .Style = NexaButtonStyle.Primary,
+            .Width = 120,
+            .Dock = DockStyle.Top
+        }
+        AddHandler saveBtn.Click, Sub(s, e) SaveSettings(nameInput.Text)
+
+        card.ContentPanel.Controls.Add(saveBtn)
+        card.ContentPanel.Controls.Add(nameInput)
+        Controls.Add(card)
+    End Sub
+End Class</code></pre>
+
         <h3>NexaPanel</h3>
         <p>A themed container that inherits from <code>System.Windows.Forms.Panel</code> with optional card styling and shadow.</p>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var card = new NexaPanel

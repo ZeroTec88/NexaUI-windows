@@ -206,6 +206,72 @@
         <h2>NexaPropertyGrid</h2>
         <p>A themed property grid that inherits from <code>System.Windows.Forms.PropertyGrid</code> with modern styling for property categories and editors.</p>
 
+        <h3>How to Add NexaPropertyGrid Manually</h3>
+        <p><code>NexaPropertyGrid</code> inherits from <code>System.Windows.Forms.PropertyGrid</code>, so all native property editing, categorization, help, and command area behavior is preserved.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution once to load NexaUI controls into the Toolbox.</li>
+            <li>Drag <code>NexaPropertyGrid</code> from the Toolbox onto your form.</li>
+            <li>Set <code>Dock</code>, <code>HelpVisible</code>, <code>ToolbarVisible</code>, and <code>PropertySort</code> in the Properties window.</li>
+            <li>Assign a <code>SelectedObject</code> in code-behind to display its properties.</li>
+        </ol>
+
+        <h4>Creating NexaPropertyGrid in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+
+public partial class SettingsForm : Form
+{
+    public SettingsForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildPropertyGrid();
+    }
+
+    private void BuildPropertyGrid()
+    {
+        var propGrid = new NexaPropertyGrid
+        {
+            Dock = DockStyle.Fill,
+            GridStyle = NexaPropertyGridStyle.Default,
+            HelpVisible = true,
+            ToolbarVisible = true,
+            PropertySort = PropertySort.Categorized
+        };
+
+        propGrid.SelectedObject = new AppSettings();
+
+        Controls.Add(propGrid);
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class SettingsForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildPropertyGrid()
+    End Sub
+
+    Private Sub BuildPropertyGrid()
+        Dim propGrid = New NexaPropertyGrid With {
+            .Dock = DockStyle.Fill,
+            .GridStyle = NexaPropertyGridStyle.Default,
+            .HelpVisible = True,
+            .ToolbarVisible = True,
+            .PropertySort = PropertySort.Categorized
+        }
+
+        propGrid.SelectedObject = New AppSettings()
+
+        Controls.Add(propGrid)
+    End Sub
+End Class</code></pre>
+
         <h3>Quick Start</h3>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var propGrid = new NexaPropertyGrid
 {

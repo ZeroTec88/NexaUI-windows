@@ -206,6 +206,89 @@
         <h2>Navigation</h2>
         <p>NexaUI navigation controls help users move through content, data, and application views with familiar yet modern patterns.</p>
 
+        <h3>How to Add Navigation Controls Manually</h3>
+        <p>Navigation controls can be added via the Designer or created in code. They support standard layout patterns like <code>Dock</code> and <code>DockStyle.Top</code>.</p>
+
+        <h4>Designer workflow</h4>
+        <ol>
+            <li>Build the solution once to load NexaUI controls into the Toolbox.</li>
+            <li>Drag a navigation control (e.g., <code>NexaBreadcrumb</code>, <code>NexaTabControl</code>) onto your form.</li>
+            <li>Set properties like <code>Dock</code>, <code>Items</code>, and <code>Style</code> in the Properties window.</li>
+            <li>Wire events like <code>ItemClicked</code> or <code>SelectedIndexChanged</code> in code-behind.</li>
+        </ol>
+
+        <h4>Creating navigation controls in code</h4>
+        <pre><code><span class="code-header"><span class="code-lang">C#</span></span>using NexaUI.Controls;
+using NexaUI.Themes;
+
+public partial class MainForm : Form
+{
+    public MainForm()
+    {
+        InitializeComponent();
+        ThemeManager.SetTheme(new LightTheme());
+        BuildNavigation();
+    }
+
+    private void BuildNavigation()
+    {
+        var breadcrumb = new NexaBreadcrumb
+        {
+            Separator = NexaBreadcrumbSeparator.Chevron,
+            Dock = DockStyle.Top,
+            Height = 40
+        };
+        breadcrumb.Items.Add(new NexaBreadcrumbItem("home", "Home"));
+        breadcrumb.Items.Add(new NexaBreadcrumbItem("products", "Products"));
+        breadcrumb.Items.Add(new NexaBreadcrumbItem("software", "Software"));
+        breadcrumb.ItemClicked += (s, e) => NavigateTo(e.Item.Key);
+
+        var tabs = new NexaTabControl
+        {
+            TabStyle = NexaTabStyle.Underline,
+            Dock = DockStyle.Fill
+        };
+        tabs.TabPages.Add(new TabPage { Text = "Overview" });
+        tabs.TabPages.Add(new TabPage { Text = "Details" });
+
+        Controls.Add(tabs);
+        Controls.Add(breadcrumb);
+    }
+}</code></pre>
+
+        <pre><code><span class="code-header"><span class="code-lang">VB.NET</span></span>Imports NexaUI.Controls
+Imports NexaUI.Themes
+
+Public Class MainForm
+    Public Sub New()
+        InitializeComponent()
+        ThemeManager.SetTheme(New LightTheme())
+        BuildNavigation()
+    End Sub
+
+    Private Sub BuildNavigation()
+        Dim breadcrumb = New NexaBreadcrumb With {
+            .Separator = NexaBreadcrumbSeparator.Chevron,
+            .Dock = DockStyle.Top,
+            .Height = 40
+        }
+        breadcrumb.Items.Add(New NexaBreadcrumbItem("home", "Home"))
+        breadcrumb.Items.Add(New NexaBreadcrumbItem("products", "Products"))
+        breadcrumb.Items.Add(New NexaBreadcrumbItem("software", "Software"))
+        AddHandler breadcrumb.ItemClicked, Sub(s, e) NavigateTo(e.Item.Key)
+
+        Dim tabs = New NexaTabControl With {
+            .TabStyle = NexaTabStyle.Underline,
+            .Dock = DockStyle.Fill
+        }
+        tabs.TabPages.Add(New TabPage With {.Text = "Overview"})
+        tabs.TabPages.Add(New TabPage With {.Text = "Details"})
+
+        Controls.Add(tabs)
+        Controls.Add(breadcrumb)
+    End Sub
+End Class</code></pre>
+
         <h3>NexaBreadcrumb</h3>
         <p>A trail-style navigation control that inherits from <code>System.Windows.Forms.FlowLayoutPanel</code>.</p>
         <pre><code><span class="code-header"><span class="code-lang">C#</span></span>var breadcrumb = new NexaBreadcrumb();

@@ -381,7 +381,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\test_app\\NexaUI\\src\\NexaUI.Controls\\NexaUI.Controls.csproj",
-        "projectName": "NexaUI.Controls",
+        "projectName": "NexaUI",
         "projectPath": "D:\\test_app\\NexaUI\\src\\NexaUI.Controls\\NexaUI.Controls.csproj",
         "packagesPath": "C:\\Users\\klgun\\.nuget\\packages\\",
         "outputPath": "D:\\test_app\\NexaUI\\src\\NexaUI.Controls\\obj\\",
