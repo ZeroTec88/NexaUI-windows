@@ -1,0 +1,40 @@
+name: Build and Publish to NuGet
+
+on:
+  push:
+    branches: [ "1.0.1" ]
+    tags: [ "v*.*.*" ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: "10.0.x"
+
+    - name: Restore
+      run: dotnet restore NexaUI.slnx
+
+    - name: Build
+      run: dotnet build NexaUI.slnx --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test tests/NexaUI.Tests/NexaUI.Tests.csproj --configuration Release --no-build --filter "FullyQualifiedName~DataControlApiTests" --verbosity normal
+
+    - name: Pack
+      run: dotnet pack src/NexaUI.Controls/NexaUI.Controls.csproj --configuration Release --no-build --output ./nuget
+
+    - name: Publish to NuGet
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+      run: dotnet nuget push ./nuget/*.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate
