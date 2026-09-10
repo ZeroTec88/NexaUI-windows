@@ -8,15 +8,15 @@
     <RootNamespace>NexaUI.Controls</RootNamespace>
     <AssemblyName>NexaUI.Controls</AssemblyName>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <PackageId>NexaUI</PackageId>
-    <Version>1.0.0</Version>
+    <PackageId>NexaUI-windows</PackageId>
+    <Version>1.0.1</Version>
     <Authors>ZeroTech</Authors>
     <Company>ZeroTech</Company>
     <Description>A modern Windows Forms UI component library for .NET 10 with theme-aware controls, designer support, and full native behavior preservation.</Description>
     <Copyright>Copyright © ZeroTech</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/your-org/NexaUI</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/your-org/NexaUI</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ZeroTec88/NexaUI-windows</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ZeroTec88/NexaUI-windows</RepositoryUrl>
     <PackageTags>winforms;dotnet;windows-forms;ui;controls;theme;designer;csharp;vbnet</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludeContentInPack>true</IncludeContentInPack>
