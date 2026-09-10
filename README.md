@@ -7,9 +7,21 @@ API design, visual identity, and theme system. The goal is to provide a
 productive, professional set of WinForms components that developers can
 consume from both **C#** and **VB.NET**.
 
+## Installation
+
+**NuGet Package:**
+```bash
+dotnet add package NexaUI
+```
+```powershell
+Install-Package NexaUI
+```
+
 ## Documentation
 
-- [📖 Full Documentation Site](docs/index.html) — Overview, getting started, control API reference, and theme system guide.
+- [📖 Full Documentation Site](https://github.com/ZeroTec88/NexaUI-windows/tree/main/docs) — Overview, getting started, control API reference, and theme system guide.
+- [📦 NuGet Package](https://www.nuget.org/packages/NexaUI)
+- [🐙 GitHub Repository](https://github.com/ZeroTec88/NexaUI-windows)
 
 ## Target Framework
 
@@ -57,7 +69,7 @@ NexaUI.Tests    -> NexaUI.Core, NexaUI.Themes, NexaUI.Icons, NexaUI.Controls
 
 ## Current Status
 
-**Phase 13 - Data Presentation Controls.**
+**Version 1.0.1 — Phase 13 Data Presentation Controls Complete.**
 
 Implemented controls:
 
