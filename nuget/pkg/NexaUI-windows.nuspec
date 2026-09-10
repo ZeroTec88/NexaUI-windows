@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>NexaUI-windows</id>
+    <version>1.0.3</version>
+    <title>NexaUI Windows Forms Controls</title>
+    <authors>ZeroTech</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/ZeroTec88/NexaUI-windows</projectUrl>
+    <description>A modern Windows Forms UI component library for .NET 10 with theme-aware controls, designer support, and full native behavior preservation.</description>
+    <copyright>Copyright © ZeroTech</copyright>
+    <tags>winforms dotnet windows-forms ui controls theme designer csharp vbnet</tags>
+    <packageTypes>
+      <packageType name="Dependency" />
+    </packageTypes>
+    <repository type="git" url="https://github.com/ZeroTec88/NexaUI-windows" />
+    <dependencies>
+      <group targetFramework="net10.0-windows10.0" />
+    </dependencies>
+  </metadata>
+</package>

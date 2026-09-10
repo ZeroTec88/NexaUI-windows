@@ -13,3 +13,4 @@ D:\test_app\NexaUI\src\NexaUI.Themes\obj\Release\net10.0-windows\NexaUI.Themes.d
 D:\test_app\NexaUI\src\NexaUI.Themes\obj\Release\net10.0-windows\refint\NexaUI.Themes.dll
 D:\test_app\NexaUI\src\NexaUI.Themes\obj\Release\net10.0-windows\NexaUI.Themes.pdb
 D:\test_app\NexaUI\src\NexaUI.Themes\obj\Release\net10.0-windows\ref\NexaUI.Themes.dll
+D:\test_app\NexaUI\src\NexaUI.Themes\obj\Release\net10.0-windows\NexaUI.Themes.sourcelink.json

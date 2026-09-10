@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "7F5Rr00E8Gs=",
+  "dgSpecHash": "jI9ZTxeRVFE=",
   "success": true,
   "projectFilePath": "D:\\test_app\\NexaUI\\samples\\NexaUI.Demo.VB\\NexaUI.Demo.VB.vbproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\klgun\\.nuget\\packages\\nexaui-windows\\1.0.1\\nexaui-windows.1.0.1.nupkg.sha512"
+  ],
   "logs": []
 }

@@ -9,3 +9,4 @@ D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\NexaUI.Core.dll
 D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\refint\NexaUI.Core.dll
 D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\NexaUI.Core.pdb
 D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\ref\NexaUI.Core.dll
+D:\test_app\NexaUI\src\NexaUI.Core\obj\Release\net10.0-windows\NexaUI.Core.sourcelink.json

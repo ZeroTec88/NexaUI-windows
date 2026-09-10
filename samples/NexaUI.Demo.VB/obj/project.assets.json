@@ -2,7 +2,7 @@
   "version": 4,
   "targets": {
     "net10.0-windows": {
-      "NexaUI/1.0.0": {
+      "NexaUI-windows/1.0.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
@@ -11,10 +11,10 @@
           "NexaUI.Themes": "1.0.0"
         },
         "compile": {
-          "bin/placeholder/NexaUI.dll": {}
+          "bin/placeholder/NexaUI-windows.dll": {}
         },
         "runtime": {
-          "bin/placeholder/NexaUI.dll": {}
+          "bin/placeholder/NexaUI-windows.dll": {}
         },
         "frameworkReferences": [
           "Microsoft.WindowsDesktop.App.WindowsForms"
@@ -65,7 +65,7 @@
     }
   },
   "libraries": {
-    "NexaUI/1.0.0": {
+    "NexaUI-windows/1.0.1": {
       "type": "project",
       "path": "../../src/NexaUI.Controls/NexaUI.Controls.csproj",
       "msbuildProject": "../../src/NexaUI.Controls/NexaUI.Controls.csproj"
@@ -88,7 +88,7 @@
   },
   "projectFileDependencyGroups": {
     "net10.0-windows": [
-      "NexaUI >= 1.0.0",
+      "NexaUI-windows >= 1.0.1",
       "NexaUI.Core >= 1.0.0",
       "NexaUI.Icons >= 1.0.0",
       "NexaUI.Themes >= 1.0.0"
@@ -177,7 +177,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

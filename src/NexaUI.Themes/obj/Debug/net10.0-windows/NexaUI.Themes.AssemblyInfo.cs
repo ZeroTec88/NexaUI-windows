@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NexaUI.Themes")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+12ac7168db304887b546719dfa3fb6b577b80ca4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ed12dfb6a4ebd9a68407a4626012128966fff748")]
 [assembly: System.Reflection.AssemblyProductAttribute("NexaUI.Themes")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NexaUI.Themes")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

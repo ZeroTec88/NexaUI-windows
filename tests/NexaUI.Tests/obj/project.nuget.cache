@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "bPCFTKWeoJk=",
+  "dgSpecHash": "HsdaGDf3PYQ=",
   "success": true,
   "projectFilePath": "D:\\test_app\\NexaUI\\tests\\NexaUI.Tests\\NexaUI.Tests.csproj",
   "expectedPackageFiles": [
@@ -23,7 +23,8 @@
     "C:\\Users\\klgun\\.nuget\\packages\\mstest.analyzers\\4.0.2\\mstest.analyzers.4.0.2.nupkg.sha512",
     "C:\\Users\\klgun\\.nuget\\packages\\mstest.testadapter\\4.0.2\\mstest.testadapter.4.0.2.nupkg.sha512",
     "C:\\Users\\klgun\\.nuget\\packages\\mstest.testframework\\4.0.2\\mstest.testframework.4.0.2.nupkg.sha512",
-    "C:\\Users\\klgun\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+    "C:\\Users\\klgun\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\klgun\\.nuget\\packages\\nexaui-windows\\1.0.1\\nexaui-windows.1.0.1.nupkg.sha512"
   ],
   "logs": []
 }

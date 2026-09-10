@@ -13,3 +13,4 @@ D:\test_app\NexaUI\src\NexaUI.Icons\obj\Release\net10.0-windows\NexaUI.Icons.dll
 D:\test_app\NexaUI\src\NexaUI.Icons\obj\Release\net10.0-windows\refint\NexaUI.Icons.dll
 D:\test_app\NexaUI\src\NexaUI.Icons\obj\Release\net10.0-windows\NexaUI.Icons.pdb
 D:\test_app\NexaUI\src\NexaUI.Icons\obj\Release\net10.0-windows\ref\NexaUI.Icons.dll
+D:\test_app\NexaUI\src\NexaUI.Icons\obj\Release\net10.0-windows\NexaUI.Icons.sourcelink.json
