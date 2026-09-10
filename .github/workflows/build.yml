@@ -36,7 +36,7 @@ jobs:
       run: dotnet pack NexaUI-windows.nuspec --configuration Release --no-build --output ./nuget
 
     - name: List package
-      run: ls -la ./nuget/
+      run: dir ./nuget/
 
     - name: Publish to NuGet
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
