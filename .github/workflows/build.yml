@@ -33,7 +33,7 @@ jobs:
       run: dotnet test tests/NexaUI.Tests/NexaUI.Tests.csproj --configuration Release --no-build --filter "FullyQualifiedName~DataControlApiTests" --verbosity normal
 
     - name: Pack
-      run: dotnet pack src/NexaUI.Controls/NexaUI.Controls.csproj --configuration Release --no-build --output ./nuget
+      run: dotnet pack NexaUI-windows.nuspec --configuration Release --no-build --output ./nuget
 
     - name: Publish to NuGet
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
