@@ -255,7 +255,7 @@ public class NexaDataGridView : DataGridView
             if (_showFilterRow == value) return;
             _showFilterRow = value;
             EnsureFilterPanel();
-            _filterPanel.Visible = value;
+            if (_filterPanel != null) _filterPanel.Visible = value;
             Invalidate();
         }
     }
@@ -274,7 +274,7 @@ public class NexaDataGridView : DataGridView
             if (_showSearchPanel == value) return;
             _showSearchPanel = value;
             EnsureSearchPanel();
-            _searchPanel.Visible = value;
+            if (_searchPanel != null) _searchPanel.Visible = value;
             Invalidate();
         }
     }
@@ -293,7 +293,7 @@ public class NexaDataGridView : DataGridView
             if (_showSummaryFooter == value) return;
             _showSummaryFooter = value;
             EnsureSummaryPanel();
-            _summaryPanel.Visible = value;
+            if (_summaryPanel != null) _summaryPanel.Visible = value;
             RefreshSummary();
             Invalidate();
         }
@@ -389,7 +389,7 @@ public class NexaDataGridView : DataGridView
         get
         {
             EnsureSummaryPanel();
-            return _summaryItems;
+            return _summaryItems!;
         }
     }
 

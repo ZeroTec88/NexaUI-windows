@@ -135,7 +135,7 @@ public class NexaListView : ListView
         using var font = theme.Typography.ToFont(NexaTypographyRole.BodyStrong, dpi);
         TextRenderer.DrawText(
             e.Graphics,
-            e.Header.Text,
+            e.Header?.Text ?? string.Empty,
             font,
             textRect,
             (Color)palette[NexaColorRole.TextPrimary].Value,
@@ -160,8 +160,8 @@ public class NexaListView : ListView
 
         var item = e.Item;
         var bounds = e.Bounds;
-        var isSelected = item.Selected && Focused;
-        var isHot = item.Selected && !Focused;
+        var isSelected = item?.Selected == true && Focused;
+        var isHot = item?.Selected == true && !Focused;
 
         Color bg;
         Color fg;
@@ -227,7 +227,7 @@ public class NexaListView : ListView
         using var font = theme.Typography.ToFont(NexaTypographyRole.Body, dpi);
         TextRenderer.DrawText(
             e.Graphics,
-            e.SubItem.Text,
+            e.SubItem?.Text ?? string.Empty,
             font,
             textRect,
             fg,

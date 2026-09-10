@@ -69,7 +69,7 @@ public class NexaBadge : Control
         get => base.Text;
         set
         {
-            base.Text = value ?? string.Empty;
+            base.Text = value;
             UpdateDisplay();
         }
     }

@@ -86,7 +86,7 @@ public class NexaTreeView : TreeView
     [Category("NexaUI")]
     [DefaultValue(true)]
     [Description("Show lines connecting child nodes.")]
-    public new bool ShowNodeLines
+    public bool ShowNodeLines
     {
         get => _showNodeLines;
         set
@@ -165,7 +165,7 @@ public class NexaTreeView : TreeView
         using var font = theme.Typography.ToFont(NexaTypographyRole.Body, dpi);
         TextRenderer.DrawText(
             e.Graphics,
-            node.Text,
+            node.Text ?? string.Empty,
             font,
             e.Bounds,
             fg,
