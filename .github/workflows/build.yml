@@ -35,6 +35,9 @@ jobs:
     - name: Pack
       run: dotnet pack NexaUI-windows.nuspec --configuration Release --no-build --output ./nuget
 
+    - name: List package
+      run: ls -la ./nuget/
+
     - name: Publish to NuGet
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-      run: dotnet nuget push ./nuget/*.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate
+      run: dotnet nuget push ./nuget/*.nupkg --source https://api.nuget.org/v3/index.json
