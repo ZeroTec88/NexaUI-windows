@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>NexaUI-windows</id>
-    <version>1.0.9</version>
+    <version>1.0.10</version>
     <title>NexaUI Windows Forms Controls</title>
     <authors>ZeroTech</authors>
     <company>ZeroTech</company>
@@ -16,10 +16,19 @@
       <packageType name="Dependency" />
     </packageTypes>
     <dependencies>
+      <group targetFramework="net10.0-windows7.0" />
       <group targetFramework="net10.0-windows10.0" />
     </dependencies>
   </metadata>
   <files>
+    <file src="src\NexaUI.Core\bin\Release\net10.0-windows\NexaUI.Core.dll" target="lib\net10.0-windows7.0" />
+    <file src="src\NexaUI.Core\bin\Release\net10.0-windows\NexaUI.Core.pdb" target="lib\net10.0-windows7.0" />
+    <file src="src\NexaUI.Themes\bin\Release\net10.0-windows\NexaUI.Themes.dll" target="lib\net10.0-windows7.0" />
+    <file src="src\NexaUI.Themes\bin\Release\net10.0-windows\NexaUI.Themes.pdb" target="lib\net10.0-windows7.0" />
+    <file src="src\NexaUI.Icons\bin\Release\net10.0-windows\NexaUI.Icons.dll" target="lib\net10.0-windows7.0" />
+    <file src="src\NexaUI.Icons\bin\Release\net10.0-windows\NexaUI.Icons.pdb" target="lib\net10.0-windows7.0" />
+    <file src="src\NexaUI.Controls\bin\Release\net10.0-windows\NexaUI.Controls.dll" target="lib\net10.0-windows7.0" />
+    <file src="src\NexaUI.Controls\bin\Release\net10.0-windows\NexaUI.Controls.pdb" target="lib\net10.0-windows7.0" />
     <file src="src\NexaUI.Core\bin\Release\net10.0-windows\NexaUI.Core.dll" target="lib\net10.0-windows10.0" />
     <file src="src\NexaUI.Core\bin\Release\net10.0-windows\NexaUI.Core.pdb" target="lib\net10.0-windows10.0" />
     <file src="src\NexaUI.Themes\bin\Release\net10.0-windows\NexaUI.Themes.dll" target="lib\net10.0-windows10.0" />
