@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyDescriptionAttribute(("A modern Windows Forms UI component library for .NET 10 with theme-aware controls" +
     ", designer support, and full native behavior preservation."))]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.1.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.1+ed12dfb6a4ebd9a68407a4626012128966fff748")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.1+4a4f023122a858c8ea62df52893d2b3b82365b1b")]
 [assembly: System.Reflection.AssemblyProductAttribute("NexaUI.Controls")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NexaUI.Controls")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.1.0")]

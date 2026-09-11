@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NexaUI.Icons")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ed12dfb6a4ebd9a68407a4626012128966fff748")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9b4045ed8599644ae187300b2cbf79721b0edd26")]
 [assembly: System.Reflection.AssemblyProductAttribute("NexaUI.Icons")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NexaUI.Icons")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
